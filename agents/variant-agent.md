@@ -6,13 +6,15 @@
 
 You receive `VariantData` and `FormInputElement[]` per the data schemas in `docs/testing-workflow.md`.
 
-Key fields: `defaultCode`, `focusCode` (null if unavailable), `errorCode` (null if unavailable), `otherVariantNames`, `isComponent`, `componentName`.
+Key fields: `defaultCode`, `focusCode` (null if unavailable), `errorCode` (null if unavailable), `otherVariantNames`, `isComponent`, `componentName`, `variantDiscoverySkipped`.
 
 ---
 
 ## Process
 
-**If `focusCode` and `errorCode` are both null and `otherVariantNames` is empty** → no variants available. Flag 1.4.1, 2.4.7, 3.3.1, 3.3.3 as: "No variants available — select variant in Figma and re-run". Proceed to 3.3.2 only.
+**If `variantDiscoverySkipped=true`** → flag 1.4.1, 2.4.7, 3.3.1, 3.3.3 as: "Unable to test — provide component group URL to test variant criteria". Proceed to 3.3.2 only.
+
+**If `focusCode` and `errorCode` are both null and `otherVariantNames` is empty** → no variants available. Flag 1.4.1, 2.4.7, 3.3.1, 3.3.3 as: "No variants available — no focus/error variants found in component group". Proceed to 3.3.2 only.
 
 ### 1.4.1 — Use of Color
 

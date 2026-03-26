@@ -40,18 +40,27 @@ get_variable_defs()   → tokenMap (token name→value)
 
 ### Variant discovery (if `isComponent=true`)
 
-1. Call `get_metadata("0:1")` to get the page-level node tree
-2. Locate the selected node and check its parent for sibling nodes
-3. Scan sibling names for variant keywords: `focus`, `focused`, `focus-visible`, `error`, `invalid`, `error-state`, `hover`, `active`, `disabled`
-4. For matching siblings:
-   - `focus`/`focused`/`focus-visible` → `get_design_context(id)` → `focusCode`
-   - `error`/`invalid`/`error-state` → `get_design_context(id)` → `errorCode`
-   - All other matches → record in `otherVariantNames`
-5. If discovery fails at any step → flag variant-dependent criteria as unable to test, continue with other tests
+**Path A — Component group URL provided upfront:**
+1. Call `get_metadata(componentGroupNodeId)` on the provided URL's node ID. Skip to step 4.
 
-If `isComponent=false` → skip variant discovery.
+**Path B — Instance URL only:**
+1. Extract the root element's `data-node-id` from `designContext` — this is the **master component ID** (`masterId`).
+2. Call `get_metadata(masterId - 1)` and `get_metadata(masterId + 1)` in parallel.
+3. If either returns a `<frame>` whose `name` matches `componentName` → use that node as the component set. Proceed to step 4.
+   If neither does → pause and ask:
+   > "Variant discovery couldn't find the component group automatically. Please paste the component group URL to test criteria 1.4.1, 2.4.7, 3.3.1, 3.3.3 — or type 'skip' to continue without variant tests."
+   - User provides URL → call `get_metadata(componentGroupNodeId)`. Proceed to step 4.
+   - User skips → set `variantDiscoverySkipped=true`. All variant-dependent criteria flagged as unable to test.
 
-**Total: 3 base + 1 page metadata + up to 2 variant contexts = max ~6 MCP calls.**
+**Step 4 — Read variants from component set:**
+Read the `<symbol>` children from the component set metadata. For each symbol's `name` attribute:
+- Contains `focus`, `focused`, or `focus-visible` → `get_design_context(id)` → `focusCode`
+- Contains `error`, `invalid`, or `error-state` → `get_design_context(id)` → `errorCode`
+- Anything else → record in `otherVariantNames`
+
+If `isComponent=false` → skip variant discovery entirely.
+
+**Total: 3 base + up to 2 probe calls (Path B only) + up to 2 variant contexts = max ~7 MCP calls.**
 
 ---
 
@@ -184,12 +193,13 @@ hasExternalLabel: boolean
 ### VariantData
 
 ```
-defaultCode: string         — full designContext code for the default state
-focusCode: string|null      — design context for focus variant, or null
-errorCode: string|null      — design context for error variant, or null
-otherVariantNames: string[] — names of other discovered variants (hover, active, disabled, etc.)
-isComponent: boolean        — from Phase 1 validation
-componentName: string       — from Phase 1 metadata name attribute
+defaultCode: string              — full designContext code for the default state
+focusCode: string|null           — design context for focus variant, or null
+errorCode: string|null           — design context for error variant, or null
+otherVariantNames: string[]      — names of other discovered variants (hover, active, disabled, etc.)
+isComponent: boolean             — from Phase 1 validation
+componentName: string            — from Phase 1 metadata name attribute
+variantDiscoverySkipped: boolean — true if user chose to skip when automatic discovery failed
 ```
 
 ---
@@ -235,7 +245,7 @@ Don't try harder — flag and move on:
 | Gradient/image background | "Unable to calculate contrast — review manually" |
 | No parent bg found in DOM | "Unable to determine background" |
 | Node can't be classified | Skip, note in output |
-| Variant discovery failed | "Unable to discover variants — select variant and re-run" |
+| Variant discovery skipped by user | "Unable to test — provide component group URL to test 1.4.1, 2.4.7, 3.3.1, 3.3.3" |
 | Specific variant doesn't exist among siblings | "No [focus/error] variant designed" |
 | CSS var unresolvable + no fallback | "Unable to resolve color/value" |
 | Unexpected design context format | "Unable to parse design data" |

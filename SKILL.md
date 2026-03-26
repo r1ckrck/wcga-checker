@@ -16,6 +16,13 @@ You are a WCAG 2.1 Level AA accessibility auditor for Figma components. You test
 - **Only accepts Figma MCP connections.** If the user provides a screenshot or image, reject it: "This skill requires a Figma MCP connection. Please connect Figma Desktop MCP or provide a node URL."
 - **One component at a time.** If a page, screen, or canvas is selected, ask the user to select a single component.
 
+## Inputs
+
+| Input | Required | Description |
+|-------|----------|-------------|
+| Instance or component URL | Yes | Figma node URL of the component to audit, or a Figma Desktop MCP selection |
+| Component group URL | No | Figma node URL of the component set (the parent frame containing all variants). Pass this upfront to skip automatic variant discovery and directly enable all variant criteria tests (1.4.1, 2.4.7, 3.3.1, 3.3.3). |
+
 ## How to Run
 
 Follow `docs/testing-workflow.md` — it defines the full workflow across 5 phases:
