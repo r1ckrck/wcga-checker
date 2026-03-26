@@ -1,7 +1,9 @@
 ---
 name: wcga-checker
 description: Audit a Figma component for WCAG 2.1 Level AA accessibility compliance
-user_invocable: true
+user-invocable: true
+model: claude-sonnet-4-6
+effort: medium
 ---
 
 # WCAG AA Component Auditor
@@ -21,11 +23,16 @@ Follow `docs/testing-workflow.md` — it defines the full workflow across 5 phas
 1. **Validate** — call `get_metadata()`, confirm selection is a single component
 2. **Collect** — call `get_screenshot()`, `get_design_context()`, `get_variable_defs()`, and variant contexts
 3. **Parse** — extract text, image, interactive, and form elements from the design context code
-4. **Test** — run 4 agents in parallel:
-   - `agents/contrast-agent.md` → 1.4.3, 1.4.11
-   - `agents/typography-agent.md` → 1.4.12, 1.4.5
-   - `agents/variant-agent.md` → 1.4.1, 2.4.7, 3.3.1, 3.3.2, 3.3.3
-   - `agents/visual-review-agent.md` → subjective screenshot review
+4. **Test** — use the Agent tool to spawn all 4 subagents simultaneously in a single message. Do not run them sequentially. Each subagent receives its instructions from its agent file and the parsed data below:
+
+   | Agent tool call | Instructions file | Data to pass |
+   |---|---|---|
+   | subagent 1 | `agents/contrast-agent.md` | `TextElement[]`, `InteractiveElement[]` |
+   | subagent 2 | `agents/typography-agent.md` | `TextElement[]`, `ImageElement[]` |
+   | subagent 3 | `agents/variant-agent.md` | `VariantData`, `FormInputElement[]` |
+   | subagent 4 | `agents/visual-review-agent.md` | screenshot image only |
+
+   For each Agent tool call: read the agent file and use its full contents as the prompt, appending the relevant parsed data. Wait for all 4 to return before proceeding.
 5. **Output** — assemble results in the format below
 
 ## Output Format
@@ -46,7 +53,7 @@ After all agents return, assemble the output in this exact structure:
 - [criterion #] [name] — [brief reason]
 ```
 
-One line per passing criterion. If all 9 pass: `All 9 component-level criteria passed.`
+A criterion appears here ONLY if ALL elements tested for it passed. If any element fails, the criterion appears ONLY in Flags (not split across both sections). One line per passing criterion. If all 9 pass: `All 9 component-level criteria passed.`
 
 ### Flags
 
@@ -55,12 +62,18 @@ One line per passing criterion. If all 9 pass: `All 9 component-level criteria p
 | # | Node | Issue |
 |---|------|-------|
 | [criterion] | "[node name]" (`[node ID]`) | [what's wrong — what's needed] |
+| | | **Unable to test** |
+| [criterion] | — | [reason unable to test] |
 ```
 
-Table format. One row per flag. Include:
-- Measured failures with values (e.g., "Contrast 2.8:1 — needs ≥4.5:1")
-- Unable-to-test items (e.g., "No focus variant found — unable to test")
-- Node column shows `—` for component-level flags (variants)
+Table format. One row per flag. Group into two sections:
+1. **Measured failures** first — rows with concrete values (e.g., "Contrast 2.8:1 — needs ≥4.5:1")
+2. Separator row: `| | | **Unable to test** |`
+3. **Unable-to-test items** — rows with "Unable to..." or "No variant found" reasons
+
+Node column rules:
+- Per-element flags: `"[node name]" (`[node ID]`)` — use `data-node-id` from the element itself or nearest parent `<div>`. For `nodeName`: use `data-name` from same node; if missing, use text content truncated to 20 chars.
+- Component-level flags (variants): `—`
 
 If no flags: `No issues found.`
 
@@ -105,7 +118,7 @@ If none relevant: `No manual checks apply to this component type.`
 
 ```
 ---
-Run `/wcga-page` for page-level checks · `/wcga-journey` for journey-level checks
+Run `/wcga-page` for page-level checks · `/wcga-journey` for journey-level checks · `/wcga-dev` for post-figma checks
 ```
 
 Always present.

@@ -1,14 +1,10 @@
 # Visual Review Agent
 
-> Subjective screenshot analysis. Not a WCAG test — AI observation only.
-
 ---
 
 ## Input
 
-You will receive: **one screenshot image** of the component.
-
-Nothing else. No code, no node data, no test results.
+You receive: **one screenshot image** of the component. Nothing else.
 
 ---
 
@@ -37,9 +33,9 @@ Look at the screenshot as a human reviewer would. Note anything that looks like 
 
 ```
 observations:
-  - "Search placeholder text appears low contrast against white background"
-  - "Navigation icons (camera, voice, QR) appear small and close together"
-  - "BAJAJ FINANCE LIMITED branding text appears very small — may be hard to read"
+  - "Placeholder text appears low contrast against background"
+  - "Icons appear small and close together — may be hard to tap"
+  - "Small text at bottom may be hard to read"
 ```
 
 - Short bullets, plain language

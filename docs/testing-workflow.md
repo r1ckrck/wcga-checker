@@ -15,10 +15,12 @@ Call `get_metadata()` on the current selection.
 
 | Tag | Action |
 |-----|--------|
-| `<symbol>` or `<instance>` | Full audit. Note component set ID for variant discovery. |
+| `<symbol>` or `<instance>` | Full audit. Carry forward: `isComponent=true`, `componentName` from metadata `name` attribute. |
 | `<frame>` with viewport dimensions or many children | Reject: "Please select a single component, not a full page." |
-| `<frame>` simple | Warn: "Not a component. Variant tests (1.4.1, 2.4.7, 3.3.1, 3.3.3) will be skipped. Proceed?" |
+| `<frame>` simple | Warn: "Not a component. Variant tests (1.4.1, 2.4.7, 3.3.1, 3.3.3) will be skipped. Proceed?" Carry forward: `isComponent=false`. |
 | `<canvas>` | Reject: "Please select a single component, not the canvas." |
+
+Record `nodeId`, `isComponent`, and `componentName` for later phases.
 
 ---
 
@@ -34,18 +36,22 @@ get_design_context()  → designContext (React+Tailwind code with all children)
 get_variable_defs()   → tokenMap (token name→value)
 ```
 
-> If `get_design_context` returns a Code Connect prompt instead of code, call it again with the same `nodeId`.
+> If `get_design_context` returns unexpected format, retry with the same `nodeId`.
 
-### Variant calls (if `<symbol>` or `<instance>`)
+### Variant discovery (if `isComponent=true`)
 
-1. `get_metadata(componentSetId)` → list of variant node IDs and names
-2. Find variants matching: `focus`, `focused`, `focus-visible`, `error`, `invalid`, `error-state`, `hover`, `active`, `disabled`
-3. `get_design_context(focusVariantId)` → focusContext
-4. `get_design_context(errorVariantId)` → errorContext
+1. Call `get_metadata("0:1")` to get the page-level node tree
+2. Locate the selected node and check its parent for sibling nodes
+3. Scan sibling names for variant keywords: `focus`, `focused`, `focus-visible`, `error`, `invalid`, `error-state`, `hover`, `active`, `disabled`
+4. For matching siblings:
+   - `focus`/`focused`/`focus-visible` → `get_design_context(id)` → `focusCode`
+   - `error`/`invalid`/`error-state` → `get_design_context(id)` → `errorCode`
+   - All other matches → record in `otherVariantNames`
+5. If discovery fails at any step → flag variant-dependent criteria as unable to test, continue with other tests
 
-If detached frame → skip variant calls, flag variant tests as unable.
+If `isComponent=false` → skip variant discovery.
 
-**Total: 3 base + up to 3 variant = max ~6 MCP calls.**
+**Total: 3 base + 1 page metadata + up to 2 variant contexts = max ~6 MCP calls.**
 
 ---
 
@@ -53,71 +59,158 @@ If detached frame → skip variant calls, flag variant tests as unable.
 
 Turn designContext + tokenMap into structured data for agents.
 
-### 3.1 — Resolve CSS variables
+### 3.1 — Resolve tokens
 
 For every `var(--token-name,fallback)` in designContext:
 - Look up `token-name` in tokenMap → use resolved value
 - Not in map → use fallback after comma
 - No fallback → flag "Unable to resolve"
 
+If a resolved value matches `Font(...)` pattern (composite font token):
+1. Parse inner fields: `size`, `weight`, `lineHeight`, `letterSpacing`
+2. If a field references another token → resolve recursively
+3. Apply extracted values to the text element (Tailwind classes override token values)
+
 ### 3.2 — Extract text elements
 
-Every `<p>` tag in the code = a text element. For each, extract from Tailwind classes:
+Every `<p>` tag in the code = a text element. For each, build a `TextElement`:
 
-| Property | How to extract |
-|----------|---------------|
-| Text color | `text-[color:...]` or `text-[rgba(...)]` class |
-| Font size | `text-[length:...px]` or `text-[Npx]` class |
-| Line height | `leading-[...]` class |
-| Font weight | `font-[...]` class → numeric: `400`=normal, `500`+=bold. String: `Medium`, `SemiBold`, `Bold`=bold. Pass as-is to contrast-agent, which handles both formats. |
-| Letter spacing | `tracking-[...]` class if present. If no class, check tokenMap for a spacing token applied to this text style. If neither → pass as missing. |
-| Paragraph spacing | Not in Tailwind classes. Check tokenMap for a paragraph-spacing token on this text style. If not found → pass as missing. |
-| Node ID | `data-node-id` on nearest parent `<div>` |
-| Node name | `data-name` on nearest parent `<div>` |
-| Parent bg | nearest ancestor `<div>` with `bg-[...]` class (walk up DOM) |
+| Field | How to extract |
+|-------|---------------|
+| `textContent` | Inner text of the `<p>` tag |
+| `fgColor` | `text-[color:...]` or `text-[rgba(...)]` class → resolve any `var()` per 3.1 |
+| `bgColor` | Nearest ancestor `<div>` with `bg-[...]` class (walk up DOM) → resolve any `var()`. If none found → `"unable to determine"` |
+| `fontSize` | `text-[length:...px]` or `text-[Npx]` class → numeric px value |
+| `fontWeight` | `font-[...]` class → numeric value (e.g., `400`, `700`) or string from font-family (e.g., `"Bold"`, `"Medium"`). Pass raw value. |
+| `lineHeight` | `leading-[...px]` or `leading-[var(...)]` class → resolve to numeric px. If `leading-[normal]` or value doesn't resolve to a number → `null` |
+| `letterSpacing` | `tracking-[...]` class → px value. If no class → check composite font token. If neither → `null` |
+| `paragraphSpacing` | Not in Tailwind classes. Check tokenMap for a `paragraph-spacing` token for this text style. If not found → `null` |
+| `isSingleLine` | `true` if this `<p>` is the only `<p>` tag within its immediate parent container (no sibling `<p>` tags) |
+| `nodeId` | `data-node-id` on the `<p>` tag itself, else on nearest parent `<div>` |
+| `nodeName` | `data-name` on the same node as `nodeId`. If no `data-name` → use `textContent` truncated to 20 chars |
 
 ### 3.3 — Extract image elements
 
-Every `<img>` tag. For each: `data-name`, dimensions from classes.
-Names containing `logo`, `logotype`, `brand`, `branding` → mark as exempt.
+Every `<img>` tag. For each, build an `ImageElement`:
+
+| Field | How to extract |
+|-------|---------------|
+| `nodeId` | `data-node-id` on nearest parent `<div>` |
+| `nodeName` | `data-name` on the same node as `nodeId` |
+| `width` | From `w-[Npx]` or `size-[Npx]` class on nearest parent `<div>`. If no class → from inline style. If neither → `null` |
+| `height` | From `h-[Npx]` or `size-[Npx]` class on nearest parent `<div>`. If no class → from inline style. If neither → `null` |
+| `isExempt` | `true` if `nodeName` contains (case-insensitive): `logo`, `logotype`, `brand`, `branding` |
 
 ### 3.4 — Extract interactive/form elements (screenshot-assisted)
 
 For remaining `<div>` elements:
 1. Look at screenshot — visually identify buttons, inputs, toggles, search bars
-2. Match to `<div>` nodes via `data-name` (e.g., `navigation/back`, `search/main`)
-3. Confirm: has `bg-[...]`, border classes, text children?
+2. Match to `<div>` nodes via `data-name`
+3. Confirm: has `bg-[...]`, `border-[...]` classes, or text children?
 4. Can't classify → skip, note in output
 
-**For form inputs** (inputs, search bars, textareas): also extract:
-- `childTextNodes` — find all `<p>` tags nested inside this `<div>`, record their text content and nesting depth
-- `hasExternalLabel` — check if a `<p>` tag exists outside/above this `<div>` in DOM (sibling or ancestor's child) that reads as a label for this input
+For each interactive element, build an `InteractiveElement`:
 
-### 3.5 — Prepare variant diffs
+| Field | How to extract |
+|-------|---------------|
+| `nodeId` | `data-node-id` on the element's `<div>` |
+| `nodeName` | `data-name` on the same `<div>` |
+| `fillColor` | From `bg-[...]` class → resolve `var()`. For icon-only elements without a bg class: fetch the SVG asset URL from the `<img>` src, parse `fill` attributes from `<path>`/`<g>` tags (`fill="var(--fill-N, #hex)"` → use hex fallback; `fill="#hex"` → use directly; `fill="none"` → check `stroke` instead; multiple fills → use dominant color). If unparseable → `null` |
+| `borderColor` | `border-[...]` color class → resolve `var()`. If no border class → `null` |
+| `parentBgColor` | Nearest ancestor `<div>` with `bg-[...]` (walk up DOM, skip self). If none → `"unable to determine"` |
+| `isIconOnly` | `true` if the element's primary content is an `<img>`/SVG with no sibling `<p>` text |
 
-If focusContext/errorContext collected:
-- Diff default vs focus → note added/changed borders, outlines, backgrounds
-- Diff default vs error → note added `<p>` tags, color changes, icons
+**For form inputs** (inputs, search bars, textareas): also build a `FormInputElement`:
+
+| Field | How to extract |
+|-------|---------------|
+| `nodeId` | Same as InteractiveElement |
+| `nodeName` | Same as InteractiveElement |
+| `childTextNodes` | For each `<p>` tag nested inside this input's `<div>`: `{text: "...", isInsideInput: true}`. For `<p>` tags that are siblings (not nested) but visually associated: `{text: "...", isInsideInput: false}` |
+| `hasExternalLabel` | `true` if ANY of: (a) a `<p>` tag is a prior sibling of this input's `<div>` in DOM, (b) a `<p>` tag is a child of the same parent `<div>` appearing before this input, (c) a nearby `data-name` contains `label` or `field` implying a label-input group. Otherwise `false`. |
+
+---
+
+## Data Schemas
+
+Single source of truth for field names passed from Phase 3 to Phase 4 agents.
+
+### TextElement
+
+```
+nodeId: string              — from data-node-id (see 3.2)
+nodeName: string            — from data-name or textContent fallback
+textContent: string         — inner text of the <p> tag
+fgColor: string             — resolved hex (#RRGGBB) or rgba(...), or "gradient"/"image"/"unable to resolve"
+bgColor: string             — resolved hex or rgba from nearest ancestor bg, or "unable to determine"
+fontSize: number            — px value
+fontWeight: number|string   — raw value: numeric (400, 700) or string ("Medium", "Bold")
+lineHeight: number|null     — px value, or null if unable to determine
+letterSpacing: number|null  — px value, or null if missing
+paragraphSpacing: number|null — px value, or null if missing/not applicable
+isSingleLine: boolean       — true if only <p> in its parent container
+```
+
+### InteractiveElement
+
+```
+nodeId: string
+nodeName: string
+fillColor: string|null      — resolved hex/rgba, or null if no fill
+borderColor: string|null    — resolved hex/rgba, or null if no border
+parentBgColor: string       — resolved hex/rgba, or "unable to determine"
+isIconOnly: boolean         — true if primary content is an <img>/<svg> with no text
+```
+
+### ImageElement
+
+```
+nodeId: string
+nodeName: string
+width: number|null          — px, or null if unable to extract
+height: number|null         — px, or null if unable to extract
+isExempt: boolean           — true if name matches logo/logotype/brand/branding
+```
+
+### FormInputElement
+
+```
+nodeId: string
+nodeName: string
+childTextNodes: [{text: string, isInsideInput: boolean}]
+hasExternalLabel: boolean
+```
+
+### VariantData
+
+```
+defaultCode: string         — full designContext code for the default state
+focusCode: string|null      — design context for focus variant, or null
+errorCode: string|null      — design context for error variant, or null
+otherVariantNames: string[] — names of other discovered variants (hover, active, disabled, etc.)
+isComponent: boolean        — from Phase 1 validation
+componentName: string       — from Phase 1 metadata name attribute
+```
 
 ---
 
 ## Phase 4: Test
 
-Run **4 agents in parallel**. Pass each agent only the data it needs from Phase 3.
+Run **4 agents in parallel**. Pass each agent only its required data per the schemas above.
 
 ### → `agents/contrast-agent.md`
 
-**Pass:** Text elements (fg color, bg color, font size, font weight) + Interactive elements (fill, border, parent bg)
+**Pass:** `TextElement[]` + `InteractiveElement[]`
 **Returns:** Per-element pass/flag with ratio and threshold
 
 ### → `agents/typography-agent.md`
 
-**Pass:** Text elements (fontSize, lineHeight, letterSpacing, paragraphSpacing — missing values passed as missing, not 0) + Image elements (name, dimensions, exempt flag)
+**Pass:** `TextElement[]` (missing values as `null`, not `0`) + `ImageElement[]`
 **Returns:** Per-element per-property pass/flag + image-of-text flags
 
 ### → `agents/variant-agent.md`
 
-**Pass:** Default code + variant codes (focus, error) + other variant names found (hover, active, disabled) + form input elements (nodeId, nodeName, childTextNodes, hasExternalLabel) + component info (isComponent, componentName)
+**Pass:** `VariantData` + `FormInputElement[]`
 **Returns:** Per-criterion result for 1.4.1, 2.4.7, 3.3.1, 3.3.2, 3.3.3
 
 ### → `agents/visual-review-agent.md`
@@ -142,6 +235,8 @@ Don't try harder — flag and move on:
 | Gradient/image background | "Unable to calculate contrast — review manually" |
 | No parent bg found in DOM | "Unable to determine background" |
 | Node can't be classified | Skip, note in output |
-| Variant doesn't exist | "Unable to test — no [focus/error] variant" |
-| CSS var unresolvable | "Unable to resolve color/value" |
+| Variant discovery failed | "Unable to discover variants — select variant and re-run" |
+| Specific variant doesn't exist among siblings | "No [focus/error] variant designed" |
+| CSS var unresolvable + no fallback | "Unable to resolve color/value" |
 | Unexpected design context format | "Unable to parse design data" |
+| Icon color unparseable | "Unable to determine icon color — verify ≥3:1 manually" |
