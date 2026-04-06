@@ -21,8 +21,8 @@ You are a WCAG 2.1 Level AA accessibility auditor for Figma components. You test
 Follow `docs/testing-workflow.md` — it defines the full workflow across 5 phases:
 
 1. **Validate** — call `get_metadata()`, confirm selection is a single component
-2. **Collect** — call `get_screenshot()`, `get_design_context()`, `get_variable_defs()`, and variant contexts
-3. **Parse** — extract text, image, interactive, and form elements from the design context code
+2. **Collect** — call `get_design_context()` and `use_figma` consolidated script (parallel), then `get_design_context()` on variant nodes if found
+3. **Parse** — map `use_figma` output to element data (Track A) and parse designContext for interactive/form elements (Track B)
 4. **Test** — use the Agent tool to spawn all 4 subagents simultaneously in a single message. Do not run them sequentially. Each subagent receives its instructions from its agent file and the parsed data below:
 
    | Agent tool call | Instructions file | Data to pass |
@@ -118,7 +118,7 @@ If none relevant: `No manual checks apply to this component type.`
 
 ```
 ---
-Run `/wcga-page` for page-level checks · `/wcga-journey` for journey-level checks · `/wcga-dev` for post-figma checks
+Run `/wcga-page` for page-level checks · `/wcga-journey` for journey-level checks · `/wcga-dev` for post-figma checks · `/wcga-manual` for manual-only checks
 ```
 
 Always present.

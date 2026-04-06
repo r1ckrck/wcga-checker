@@ -6,7 +6,7 @@
 
 You receive `TextElement[]` and `ImageElement[]` per the data schemas in `docs/testing-workflow.md`.
 
-Key fields used: `fontSize`, `lineHeight` (number or null), `letterSpacing` (number or null), `paragraphSpacing` (number or null), `isSingleLine` (boolean). Null means unable to determine — pass as omitted to the script.
+Key fields used: `fontSize`, `lineHeight` (number, `"auto"`, or null), `letterSpacing` (number or null), `paragraphSpacing` (number or null), `isSingleLine` (boolean). Null means unable to determine — pass as omitted to the script. `"auto"` means no fixed constraint is set — automatic pass, do not test or flag.
 
 ---
 
@@ -16,7 +16,9 @@ Key fields used: `fontSize`, `lineHeight` (number or null), `letterSpacing` (num
 
 **Build script arguments:**
 - Always pass: `--font-size <fontSize>`
-- If `lineHeight` is not null → pass `--line-height <lineHeight>`
+- If `lineHeight` is a number → pass `--line-height <lineHeight>`
+- If `lineHeight` is `"auto"` → skip (automatic pass)
+- If `lineHeight` is null → omit (will be flagged as unable to determine)
 - If `letterSpacing` is not null → pass `--letter-spacing <letterSpacing>`
 - If `isSingleLine` is true → pass `--single-line`
 - If `isSingleLine` is false and `paragraphSpacing` is not null → pass `--paragraph-spacing <paragraphSpacing>`
