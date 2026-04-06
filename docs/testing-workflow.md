@@ -20,7 +20,13 @@ Call `get_metadata()` on the current selection.
 | `<frame>` simple | Warn: "Not a component. Variant tests (1.4.1, 2.4.7, 3.3.1, 3.3.3) will be skipped. Proceed?" Carry forward: `isComponent=false`. |
 | `<canvas>` | Reject: "Please select a single component, not the canvas." |
 
-Record `nodeId`, `isComponent`, and `componentName` for later phases.
+Record `nodeId`, `fileKey`, `isComponent`, and `componentName` for later phases.
+
+**Extracting `fileKey`:**
+- If user provides URL → extract from `figma.com/design/:fileKey/...`
+- If Desktop MCP → `fileKey` comes from the connected file context
+
+All MCP tools in Phase 2 require `fileKey`.
 
 ---
 
@@ -31,103 +37,313 @@ Record `nodeId`, `isComponent`, and `componentName` for later phases.
 ### Base calls (run in parallel)
 
 ```
-get_screenshot()      → screenshot
-get_design_context()  → designContext (React+Tailwind code with all children)
-get_variable_defs()   → tokenMap (token name→value)
+Call 1: get_design_context(nodeId, fileKey)  → designContext (React+Tailwind code + screenshot)
+Call 2: use_figma(fileKey, script)           → figmaData (all properties + variant IDs)
 ```
+
+- `get_design_context` returns React+Tailwind code AND a screenshot — no separate `get_screenshot()` call needed
+- `use_figma` runs the consolidated script that extracts textNodes, vectorNodes, imageNodes, instanceNodes, and variants
+- `get_variable_defs()` is not needed — `use_figma` reads resolved fill values directly from nodes
 
 > If `get_design_context` returns unexpected format, retry with the same `nodeId`.
 
+### use_figma call requirements
+
+- Must pass `skillNames: "figma-use"` and a `description` string
+- Code uses `return` (not console.log) to send data back
+- Code is NOT wrapped in async IIFE (auto-wrapped by the runtime)
+- On error: stop, read error message, fix script, retry — don't blindly retry the same code
+
+### Consolidated use_figma script
+
+Replace `YOUR_NODE_ID` with the actual `nodeId` from Phase 1.
+
+```js
+const nodeId = 'YOUR_NODE_ID';
+const node = await figma.getNodeByIdAsync(nodeId);
+
+if (!node) return { error: 'Node not found' };
+
+const result = {
+  nodeType: node.type,
+  nodeName: node.name,
+  width: Math.round(node.width),
+  height: Math.round(node.height),
+
+  textNodes: [],
+  vectorNodes: [],   // icons — use for 1.4.11
+  instanceNodes: [], // component instances
+  imageNodes: [],    // nodes with IMAGE paint fills — use for 1.4.5
+
+  variants: null
+};
+
+function fillToHex(fill) {
+  if (!fill) return null;
+  if (fill.type !== 'SOLID') return fill.type; // 'IMAGE', 'GRADIENT_LINEAR', etc.
+  const { r, g, b } = fill.color;
+  const toHex = v => Math.round(v * 255).toString(16).padStart(2, '0');
+  const hex = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  return (fill.opacity !== undefined && fill.opacity < 1)
+    ? `${hex}@${Math.round(fill.opacity * 100)}%`
+    : hex;
+}
+
+function getParentBg(n) {
+  let p = n.parent;
+  while (p) {
+    // Skip BOOLEAN_OPERATION — it's a shape mask, not a layout container
+    if (p.type !== 'BOOLEAN_OPERATION' && p.fills?.length > 0) {
+      const solidFill = p.fills.find(f => f.type === 'SOLID' && f.visible !== false);
+      if (solidFill) return fillToHex(solidFill);
+    }
+    p = p.parent;
+  }
+  return 'unable to determine';
+}
+
+function hasImageFill(n) {
+  return n.fills?.some(f => f.type === 'IMAGE') ?? false;
+}
+
+const descendants = node.findAll(() => true);
+
+for (const n of descendants) {
+  if (n.type === 'TEXT') {
+    result.textNodes.push({
+      nodeId: n.id,
+      nodeName: n.name,
+      characters: n.characters?.slice(0, 60),
+      fontSize: n.fontSize,
+      fontWeight: n.fontWeight,
+      fontFamily: n.fontName?.family,
+      fontStyle: n.fontName?.style,
+      lineHeight: n.lineHeight,       // { unit: "PIXELS"|"PERCENT"|"AUTO", value? }
+      letterSpacing: n.letterSpacing, // { unit: "PIXELS"|"PERCENT", value }
+      fgColor: n.fills?.length > 0 ? fillToHex(n.fills[0]) : 'none',
+      bgColor: getParentBg(n),
+      isSingleLine: !n.characters?.includes('\n')
+    });
+  } else if (n.type === 'VECTOR' || n.type === 'BOOLEAN_OPERATION') {
+    result.vectorNodes.push({
+      nodeId: n.id,
+      nodeName: n.name,
+      type: n.type,
+      fillColor: n.fills?.length > 0 ? fillToHex(n.fills[0]) : 'none',
+      parentBgColor: getParentBg(n)
+    });
+  } else if (n.type === 'INSTANCE') {
+    result.instanceNodes.push({
+      nodeId: n.id,
+      nodeName: n.name,
+      mainComponentName: n.mainComponent?.name,
+      width: Math.round(n.width),
+      height: Math.round(n.height)
+    });
+  } else if (hasImageFill(n)) {
+    // Raster image nodes — candidates for 1.4.5 image-of-text check
+    result.imageNodes.push({
+      nodeId: n.id,
+      nodeName: n.name,
+      width: Math.round(n.width),
+      height: Math.round(n.height),
+      isExempt: n.name.toLowerCase().includes('logo') || n.name.toLowerCase().includes('brand')
+    });
+  }
+}
+
+// Variant discovery
+const sourceNode = node.type === 'INSTANCE' ? node.mainComponent : node;
+if (sourceNode) {
+  const compSet = sourceNode.parent?.type === 'COMPONENT_SET' ? sourceNode.parent : sourceNode;
+  result.variants = {
+    compSetId: compSet.id,
+    compSetName: compSet.name,
+    variants: compSet.children?.map(c => ({ name: c.name, id: c.id })) || []
+  };
+}
+
+return result;
+```
+
+### use_figma output schema
+
+```ts
+{
+  nodeType: string          // "INSTANCE" | "COMPONENT" | "FRAME" etc.
+  nodeName: string
+  width: number
+  height: number
+
+  textNodes: {
+    nodeId: string
+    nodeName: string
+    characters: string      // first 60 chars
+    fontSize: number
+    fontWeight: number      // exact: 400, 500, 700 etc.
+    fontFamily: string
+    fontStyle: string       // "Regular" | "Medium" | "Bold" etc.
+    lineHeight: { unit: "PIXELS" | "PERCENT" | "AUTO", value?: number }
+    letterSpacing: { unit: "PIXELS" | "PERCENT", value: number }
+    fgColor: string         // "#rrggbb" or "#rrggbb@N%" or "none"
+    bgColor: string         // "#rrggbb" or "unable to determine"
+    isSingleLine: boolean
+  }[]
+
+  vectorNodes: {
+    nodeId: string
+    nodeName: string
+    type: "VECTOR" | "BOOLEAN_OPERATION"
+    fillColor: string       // "#rrggbb" or "IMAGE" | "GRADIENT_LINEAR" etc. or "none"
+    parentBgColor: string
+  }[]
+
+  instanceNodes: {
+    nodeId: string
+    nodeName: string
+    mainComponentName: string
+    width: number
+    height: number
+  }[]
+
+  imageNodes: {
+    nodeId: string
+    nodeName: string
+    width: number
+    height: number
+    isExempt: boolean       // true if name contains "logo" or "brand"
+  }[]
+
+  variants: {
+    compSetId: string
+    compSetName: string
+    variants: { name: string, id: string }[]
+  } | null
+}
+```
+
 ### Variant discovery (if `isComponent=true`)
 
-1. Call `get_metadata("0:1")` to get the page-level node tree
-2. Locate the selected node and check its parent for sibling nodes
-3. Scan sibling names for variant keywords: `focus`, `focused`, `focus-visible`, `error`, `invalid`, `error-state`, `hover`, `active`, `disabled`
-4. For matching siblings:
-   - `focus`/`focused`/`focus-visible` → `get_design_context(id)` → `focusCode`
-   - `error`/`invalid`/`error-state` → `get_design_context(id)` → `errorCode`
-   - All other matches → record in `otherVariantNames`
-5. If discovery fails at any step → flag variant-dependent criteria as unable to test, continue with other tests
+If `figmaData.variants` is not null:
 
-If `isComponent=false` → skip variant discovery.
+1. Scan `variants.variants[]` names for state keywords
+2. Matching rules (handle both simple names like `focus` and property-based names like `state=focus`):
+   - Contains `focus` / `focused` / `focus-visible` → `focusVariantId`
+   - Contains `error` / `invalid` / `error-state` / `form` (when no explicit error variant) → `errorVariantId`
+   - All other variant names → `otherVariantNames[]`
+3. If `focusVariantId` or `errorVariantId` found → conditional calls (parallel):
+   ```
+   Call 3: get_design_context(focusVariantId, fileKey)  → focusCode
+   Call 4: get_design_context(errorVariantId, fileKey)  → errorCode
+   ```
+4. If no matching variants → set `focusCode=null`, `errorCode=null` → variant-dependent criteria flagged as unable to test
 
-**Total: 3 base + 1 page metadata + up to 2 variant contexts = max ~6 MCP calls.**
+If `figmaData.variants` is null (not a component) → skip, flag variant criteria.
+
+If `isComponent=false` → skip variant discovery entirely.
+
+### Fallback: use_figma unavailable
+
+If `use_figma` fails (e.g., View seat, rate limit): flag as "use_figma unavailable" and fall back to CSS parsing from `get_design_context` for what's possible. Icon fills and exact typography will be flagged as unable to determine.
+
+**Total: 2 base + 0-2 conditional = 2-4 MCP calls.**
 
 ---
 
 ## Phase 3: Parse
 
-Turn designContext + tokenMap into structured data for agents.
+Turn collected data into structured schemas for agents. Two processing tracks:
 
-### 3.1 — Resolve tokens
+- **Track A** — From `use_figma` output (`figmaData`): exact values for text, icons, and images
+- **Track B** — From `get_design_context` code (`designContext`): CSS parsing for non-icon interactive elements and form inputs
 
-For every `var(--token-name,fallback)` in designContext:
-- Look up `token-name` in tokenMap → use resolved value
-- Not in map → use fallback after comma
-- No fallback → flag "Unable to resolve"
+### Track A — From use_figma output (exact values)
 
-If a resolved value matches `Font(...)` pattern (composite font token):
-1. Parse inner fields: `size`, `weight`, `lineHeight`, `letterSpacing`
-2. If a field references another token → resolve recursively
-3. Apply extracted values to the text element (Tailwind classes override token values)
+#### 3.1 — Build TextElement[] from `figmaData.textNodes`
 
-### 3.2 — Extract text elements
+Direct field mapping with these conversions:
 
-Every `<p>` tag in the code = a text element. For each, build a `TextElement`:
+| Field | Source | Conversion |
+|-------|--------|-----------|
+| `nodeId` | `textNode.nodeId` | Direct |
+| `nodeName` | `textNode.nodeName` | Direct |
+| `textContent` | `textNode.characters` | Direct (first 60 chars) |
+| `fgColor` | `textNode.fgColor` | If `#rrggbb@N%` → pre-blend with bgColor (see blending rule below). If plain `#rrggbb` → direct. If `"none"` → `"unable to resolve"`. If `"IMAGE"` or starts with `"GRADIENT"` → `"unable to resolve"` (non-solid text fill) |
+| `bgColor` | `textNode.bgColor` | Direct (`#rrggbb` or `"unable to determine"`) |
+| `fontSize` | `textNode.fontSize` | Direct (px number) |
+| `fontWeight` | `textNode.fontWeight` | Direct (number like 400, 700) |
+| `lineHeight` | `textNode.lineHeight` | If `unit=PIXELS` → `value`. If `unit=PERCENT` → `(value / 100) × fontSize`. If `unit=AUTO` → `"auto"` (automatic pass — no fixed constraint, user overrides can apply) |
+| `letterSpacing` | `textNode.letterSpacing` | If `unit=PIXELS` → `value`. If `unit=PERCENT` → `(value / 100) × fontSize` |
+| `paragraphSpacing` | n/a | Always `null` (not available from use_figma at node level) |
+| `isSingleLine` | `textNode.isSingleLine` | Direct |
 
-| Field | How to extract |
-|-------|---------------|
-| `textContent` | Inner text of the `<p>` tag |
-| `fgColor` | `text-[color:...]` or `text-[rgba(...)]` class → resolve any `var()` per 3.1 |
-| `bgColor` | Nearest ancestor `<div>` with `bg-[...]` class (walk up DOM) → resolve any `var()`. If none found → `"unable to determine"` |
-| `fontSize` | `text-[length:...px]` or `text-[Npx]` class → numeric px value |
-| `fontWeight` | `font-[...]` class → numeric value (e.g., `400`, `700`) or string from font-family (e.g., `"Bold"`, `"Medium"`). Pass raw value. |
-| `lineHeight` | `leading-[...px]` or `leading-[var(...)]` class → resolve to numeric px. If `leading-[normal]` or value doesn't resolve to a number → `null` |
-| `letterSpacing` | `tracking-[...]` class → px value. If no class → check composite font token. If neither → `null` |
-| `paragraphSpacing` | Not in Tailwind classes. Check tokenMap for a `paragraph-spacing` token for this text style. If not found → `null` |
-| `isSingleLine` | `true` if this `<p>` is the only `<p>` tag within its immediate parent container (no sibling `<p>` tags) |
-| `nodeId` | `data-node-id` on the `<p>` tag itself, else on nearest parent `<div>` |
-| `nodeName` | `data-name` on the same node as `nodeId`. If no `data-name` → use `textContent` truncated to 20 chars |
+**Blending rule (semi-transparent colors):**
 
-### 3.3 — Extract image elements
+```
+If fgColor = "#rrggbb@N%" and bgColor is a resolved hex:
+  alpha = N / 100
+  effective_r = fg_r × alpha + bg_r × (1 - alpha)
+  effective_g = fg_g × alpha + bg_g × (1 - alpha)
+  effective_b = fg_b × alpha + bg_b × (1 - alpha)
+  fgColor = "#" + hex(round(effective_r)) + hex(round(effective_g)) + hex(round(effective_b))
 
-Every `<img>` tag. For each, build an `ImageElement`:
+If fgColor has @N% but bgColor is "unable to determine":
+  → flag: "Semi-transparent text on unknown background — verify contrast manually"
+```
 
-| Field | How to extract |
-|-------|---------------|
-| `nodeId` | `data-node-id` on nearest parent `<div>` |
-| `nodeName` | `data-name` on the same node as `nodeId` |
-| `width` | From `w-[Npx]` or `size-[Npx]` class on nearest parent `<div>`. If no class → from inline style. If neither → `null` |
-| `height` | From `h-[Npx]` or `size-[Npx]` class on nearest parent `<div>`. If no class → from inline style. If neither → `null` |
-| `isExempt` | `true` if `nodeName` contains (case-insensitive): `logo`, `logotype`, `brand`, `branding` |
+#### 3.2 — Build icon InteractiveElement[] from `figmaData.vectorNodes`
 
-### 3.4 — Extract interactive/form elements (screenshot-assisted)
+| Field | Source | Notes |
+|-------|--------|-------|
+| `nodeId` | `vectorNode.nodeId` | Direct |
+| `nodeName` | `vectorNode.nodeName` | Direct |
+| `fillColor` | `vectorNode.fillColor` | If `"IMAGE"` or starts with `"GRADIENT"` → `null` (tap out). Otherwise → direct hex |
+| `borderColor` | n/a | Always `null` (icons don't have separate borders) |
+| `parentBgColor` | `vectorNode.parentBgColor` | Direct |
+| `isIconOnly` | n/a | Always `true` |
 
-For remaining `<div>` elements:
+**Dedup rule:** If a VECTOR node's parent is a BOOLEAN_OPERATION that is also in the list, skip the child VECTOR — use only the BOOLEAN_OPERATION entry. This avoids double-counting sub-paths of composite icons.
+
+#### 3.3 — Build ImageElement[] from `figmaData.imageNodes`
+
+Direct passthrough — all fields map 1:1. This list contains ONLY nodes with IMAGE paint fills. Vectors/icons are NOT here — they are handled separately as InteractiveElement[] in 3.2.
+
+### Track B — From get_design_context code (CSS parsing)
+
+#### 3.4 — Build non-icon InteractiveElement[]
+
+Same screenshot-assisted approach, but scoped to non-icon elements only:
+
 1. Look at screenshot — visually identify buttons, inputs, toggles, search bars
-2. Match to `<div>` nodes via `data-name`
-3. Confirm: has `bg-[...]`, `border-[...]` classes, or text children?
-4. Can't classify → skip, note in output
+2. Match to `<div>` nodes in designContext via `data-name`
+3. Skip any elements already covered in vectorNodes (matched by `data-node-id`)
+4. Extract:
+   - `fillColor` from `bg-[...]` class → resolve `var(--token, fallback)` using fallback value
+   - `borderColor` from `border-[...]` color class → resolve using fallback
+   - `parentBgColor` by walking up ancestor `<div>` nodes for nearest `bg-[...]`
+   - `isIconOnly`: `true` if primary content is an `<img>` with no sibling text
 
-For each interactive element, build an `InteractiveElement`:
+For CSS var resolution (without token map):
+- `var(--token-name, #fallback)` → use `#fallback` directly
+- No fallback → `"unable to resolve"`
 
-| Field | How to extract |
-|-------|---------------|
-| `nodeId` | `data-node-id` on the element's `<div>` |
-| `nodeName` | `data-name` on the same `<div>` |
-| `fillColor` | From `bg-[...]` class → resolve `var()`. For icon-only elements without a bg class: fetch the SVG asset URL from the `<img>` src, parse `fill` attributes from `<path>`/`<g>` tags (`fill="var(--fill-N, #hex)"` → use hex fallback; `fill="#hex"` → use directly; `fill="none"` → check `stroke` instead; multiple fills → use dominant color). If unparseable → `null` |
-| `borderColor` | `border-[...]` color class → resolve `var()`. If no border class → `null` |
-| `parentBgColor` | Nearest ancestor `<div>` with `bg-[...]` (walk up DOM, skip self). If none → `"unable to determine"` |
-| `isIconOnly` | `true` if the element's primary content is an `<img>`/SVG with no sibling `<p>` text |
+#### 3.5 — Build FormInputElement[]
 
-**For form inputs** (inputs, search bars, textareas): also build a `FormInputElement`:
+Parse from get_design_context code:
+- Identify form inputs (search bars, text inputs) via screenshot + `data-name`
+- Build `childTextNodes[]` from nested `<p>` tags: `{text: "...", isInsideInput: true}` for nested, `{text: "...", isInsideInput: false}` for visually associated siblings
+- Determine `hasExternalLabel`: `true` if ANY of: (a) a `<p>` tag is a prior sibling of this input's `<div>`, (b) a `<p>` tag is a child of the same parent `<div>` appearing before this input, (c) a nearby `data-name` contains `label` or `field`. Otherwise `false`.
 
-| Field | How to extract |
-|-------|---------------|
-| `nodeId` | Same as InteractiveElement |
-| `nodeName` | Same as InteractiveElement |
-| `childTextNodes` | For each `<p>` tag nested inside this input's `<div>`: `{text: "...", isInsideInput: true}`. For `<p>` tags that are siblings (not nested) but visually associated: `{text: "...", isInsideInput: false}` |
-| `hasExternalLabel` | `true` if ANY of: (a) a `<p>` tag is a prior sibling of this input's `<div>` in DOM, (b) a `<p>` tag is a child of the same parent `<div>` appearing before this input, (c) a nearby `data-name` contains `label` or `field` implying a label-input group. Otherwise `false`. |
+#### 3.6 — Build VariantData
+
+| Field | Source |
+|-------|--------|
+| `defaultCode` | Full designContext from base `get_design_context` call |
+| `focusCode` | From conditional `get_design_context(focusVariantId)`, or `null` |
+| `errorCode` | From conditional `get_design_context(errorVariantId)`, or `null` |
+| `otherVariantNames` | Non-focus, non-error variant names from `figmaData.variants` |
+| `isComponent` | From Phase 1 |
+| `componentName` | From Phase 1 |
 
 ---
 
@@ -138,31 +354,35 @@ Single source of truth for field names passed from Phase 3 to Phase 4 agents.
 ### TextElement
 
 ```
-nodeId: string              — from data-node-id (see 3.2)
-nodeName: string            — from data-name or textContent fallback
-textContent: string         — inner text of the <p> tag
-fgColor: string             — resolved hex (#RRGGBB) or rgba(...), or "gradient"/"image"/"unable to resolve"
-bgColor: string             — resolved hex or rgba from nearest ancestor bg, or "unable to determine"
+nodeId: string              — from use_figma textNodes
+nodeName: string            — from use_figma textNodes
+textContent: string         — first 60 chars of text content
+fgColor: string             — resolved hex (#RRGGBB), pre-blended if semi-transparent. Source: use_figma textNodes
+bgColor: string             — resolved hex from parent traversal (use_figma), or "unable to determine"
 fontSize: number            — px value
 fontWeight: number|string   — raw value: numeric (400, 700) or string ("Medium", "Bold")
-lineHeight: number|null     — px value, or null if unable to determine
-letterSpacing: number|null  — px value, or null if missing
-paragraphSpacing: number|null — px value, or null if missing/not applicable
-isSingleLine: boolean       — true if only <p> in its parent container
+lineHeight: number|null     — px value (converted from use_figma unit), or null if unable to determine
+letterSpacing: number|null  — px value (converted from use_figma unit), or null if missing
+paragraphSpacing: number|null — always null (not available from use_figma)
+isSingleLine: boolean       — true if text contains no newlines
 ```
 
 ### InteractiveElement
 
+Two sources feed this schema — icon elements from use_figma vectorNodes (Track A, 3.2) and non-icon interactive elements from designContext CSS parsing (Track B, 3.4).
+
 ```
 nodeId: string
 nodeName: string
-fillColor: string|null      — resolved hex/rgba, or null if no fill
-borderColor: string|null    — resolved hex/rgba, or null if no border
-parentBgColor: string       — resolved hex/rgba, or "unable to determine"
-isIconOnly: boolean         — true if primary content is an <img>/<svg> with no text
+fillColor: string|null      — for icons: exact hex from use_figma vectorNodes. For non-icon elements: from bg-[...] CSS class in designContext. null if no fill
+borderColor: string|null    — resolved hex, or null if no border
+parentBgColor: string       — resolved hex, or "unable to determine"
+isIconOnly: boolean         — true if primary content is an icon/vector with no text
 ```
 
 ### ImageElement
+
+Contains only nodes with IMAGE paint fills. Vector/SVG icons are excluded and handled separately as InteractiveElement[].
 
 ```
 nodeId: string
@@ -182,6 +402,8 @@ hasExternalLabel: boolean
 ```
 
 ### VariantData
+
+Variants discovered via use_figma COMPONENT_SET traversal (not get_metadata page scan).
 
 ```
 defaultCode: string         — full designContext code for the default state
@@ -203,20 +425,28 @@ Run **4 agents in parallel**. Pass each agent only its required data per the sch
 **Pass:** `TextElement[]` + `InteractiveElement[]`
 **Returns:** Per-element pass/flag with ratio and threshold
 
+TextElement[].fgColor is pre-blended hex — no rgba handling needed. Icon InteractiveElement[] have exact fills from use_figma.
+
 ### → `agents/typography-agent.md`
 
 **Pass:** `TextElement[]` (missing values as `null`, not `0`) + `ImageElement[]`
 **Returns:** Per-element per-property pass/flag + image-of-text flags
+
+lineHeight and letterSpacing are pre-converted to px. imageNodes exclude vectors — no false positives on icons.
 
 ### → `agents/variant-agent.md`
 
 **Pass:** `VariantData` + `FormInputElement[]`
 **Returns:** Per-criterion result for 1.4.1, 2.4.7, 3.3.1, 3.3.2, 3.3.3
 
+Variant IDs discovered from use_figma COMPONENT_SET traversal. Code strings from get_design_context.
+
 ### → `agents/visual-review-agent.md`
 
 **Pass:** Screenshot only
 **Returns:** `observations` array — short bullets of visual concerns
+
+Screenshot included in get_design_context response — no separate call needed.
 
 ---
 
@@ -239,4 +469,7 @@ Don't try harder — flag and move on:
 | Specific variant doesn't exist among siblings | "No [focus/error] variant designed" |
 | CSS var unresolvable + no fallback | "Unable to resolve color/value" |
 | Unexpected design context format | "Unable to parse design data" |
-| Icon color unparseable | "Unable to determine icon color — verify ≥3:1 manually" |
+| use_figma call fails | "Unable to extract exact properties — review element values manually" |
+| vectorNode.fillColor is IMAGE or GRADIENT | "Image/gradient fill — contrast cannot be measured" |
+| fgColor has @N% but bgColor unresolvable | "Semi-transparent text on unknown background — verify contrast manually" |
+| lineHeight unit is AUTO | Automatic pass — no fixed constraint set |
