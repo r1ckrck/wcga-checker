@@ -1,5 +1,5 @@
 ---
-name: wcga-manual
+name: wcag-manual
 description: Show the WCAG 2.1 AA checklist for criteria that cannot be tested by AI or MCP
 ---
 
@@ -56,4 +56,4 @@ These cannot be tested automatically — they require human judgement or live in
 - [ ] Motion-based interactions can be disabled
 
 ---
-Run `/wcga-checker` for component checks · `/wcga-page` for full-screen checks · `/wcga-journey` for cross-screen checks · `/wcga-dev` for implementation checks
+Run `/wcag-checker` for component checks · `/wcag-page` for full-screen checks · `/wcag-journey` for cross-screen checks · `/wcag-dev` for implementation checks

@@ -22,10 +22,10 @@ wcga-checker/
 │   ├── contrast-ratio.py        (WCAG contrast ratio calculator)
 │   └── text-spacing-check.py    (WCAG text spacing validator)
 ├── commands/
-│   ├── wcga-page.md             (page-level checklist)
-│   ├── wcga-journey.md          (journey-level checklist)
-│   ├── wcga-dev.md              (post-figma / dev-handoff checklist)
-│   └── wcga-manual.md           (manual checks — not testable by AI or MCP)
+│   ├── wcag-page.md             (page-level checklist)
+│   ├── wcag-journey.md          (journey-level checklist)
+│   ├── wcag-dev.md              (post-figma / dev-handoff checklist)
+│   └── wcag-manual.md           (manual checks — not testable by AI or MCP)
 └── agents/
     ├── contrast-agent.md        (1.4.3, 1.4.11)
     ├── typography-agent.md      (1.4.12, 1.4.5)

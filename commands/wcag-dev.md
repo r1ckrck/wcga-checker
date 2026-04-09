@@ -1,5 +1,5 @@
 ---
-name: wcga-dev
+name: wcag-dev
 description: Show the WCAG 2.1 AA checklist for post-Figma implementation checks
 ---
 
@@ -49,4 +49,4 @@ These cannot be verified in Figma — review the **built implementation**.
 - [ ] Videos have captions; audio has a transcript
 
 ---
-Run `/wcga-checker` for component checks · `/wcga-page` for full-screen checks · `/wcga-journey` for cross-screen checks · `/wcga-manual` for manual-only checks
+Run `/wcag-checker` for component checks · `/wcag-page` for full-screen checks · `/wcag-journey` for cross-screen checks · `/wcag-manual` for manual-only checks

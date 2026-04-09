@@ -1,5 +1,5 @@
 ---
-name: wcga-page
+name: wcag-page
 description: Show the WCAG 2.1 AA checklist for page-level checks
 ---
 
@@ -43,4 +43,4 @@ These require reviewing the **full screen design** — not individual components
 - [ ] No element appears visually after another but would be focused before it
 
 ---
-Run `/wcga-checker` for component checks · `/wcga-journey` for cross-screen checks · `/wcga-dev` for implementation checks · `/wcga-manual` for manual-only checks
+Run `/wcag-checker` for component checks · `/wcag-journey` for cross-screen checks · `/wcag-dev` for implementation checks · `/wcag-manual` for manual-only checks

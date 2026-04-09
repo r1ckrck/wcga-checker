@@ -1,5 +1,5 @@
 ---
-name: wcga-journey
+name: wcag-journey
 description: Show the WCAG 2.1 AA checklist for journey-level checks across multiple screens
 ---
 
@@ -30,4 +30,4 @@ These require reviewing **multiple screens together** — not individual pages o
 - [ ] Submitted forms have an undo or edit mechanism designed
 
 ---
-Run `/wcga-checker` for component checks · `/wcga-page` for full-screen checks · `/wcga-dev` for implementation checks · `/wcga-manual` for manual-only checks
+Run `/wcag-checker` for component checks · `/wcag-page` for full-screen checks · `/wcag-dev` for implementation checks · `/wcag-manual` for manual-only checks

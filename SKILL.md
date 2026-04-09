@@ -1,5 +1,5 @@
 ---
-name: wcga-checker
+name: wcag-checker
 description: Audit a Figma component for WCAG 2.1 Level AA accessibility compliance
 user-invocable: true
 model: claude-sonnet-4-6
@@ -118,7 +118,7 @@ If none relevant: `No manual checks apply to this component type.`
 
 ```
 ---
-Run `/wcga-page` for page-level checks · `/wcga-journey` for journey-level checks · `/wcga-dev` for post-figma checks · `/wcga-manual` for manual-only checks
+Run `/wcag-page` for page-level checks · `/wcag-journey` for journey-level checks · `/wcag-dev` for post-figma checks · `/wcag-manual` for manual-only checks
 ```
 
 Always present.
