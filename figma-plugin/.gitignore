@@ -13,11 +13,7 @@ Thumbs.db
 # --- Dependencies ---
 node_modules/
 .pnpm-store/
-
-
-# --- Python bytecode (scripts/contrast-ratio.py and text-spacing-check.py) ---
-__pycache__/
-*.pyc
+dist/
 
 
 # --- Logs ---
@@ -37,4 +33,8 @@ pnpm-debug.log*
 # --- Claude Code local settings ---
 .claude/settings.local.json
 .claude/plans/
-.claude/
+
+# --- Debug working notes ---
+# Local-only audit findings tracker; not part of the shipped plugin.
+debug-notes.md
+

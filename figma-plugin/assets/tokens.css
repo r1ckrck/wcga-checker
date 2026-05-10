@@ -1,0 +1,65 @@
+/*
+ * Design tokens for the assistant's visual system.
+ * Consumable in any project that wants the same look — Remotion, web, decks, anywhere CSS reads.
+ * Each token carries a short note on the feeling behind it. Long-form rationale lives in design.md.
+ *
+ * Light mode is the default. Dark mode flips by setting [data-theme="dark"] on a parent.
+ */
+
+:root {
+  /* ── Color ─────────────────────────────────────────────────────────── */
+
+  --bg: #F2EEE3;            /* warm off-white anchor — never cold pure white */
+  --fg: #111111;            /* near-black; carries body, marks, structural lines */
+  --mute: #7A7569;          /* secondary voice — annotations, captions, support */
+  --hairline: rgba(31, 31, 31, 0.30);
+                            /* drafting-line presence at low opacity — quiet, precise */
+  --hairline-soft: rgba(31, 31, 31, 0.12);
+                            /* even quieter — within-card item dividers */
+  --accent: #5C3F4E;        /* dusty plum — used once per piece, the eye magnet */
+
+  /* ── Icon coloring ────────────────────────────────────────────────── */
+
+  --icon-primary: var(--fg);
+                            /* outline reads as the structural mark */
+  --icon-secondary: var(--mute);
+                            /* fill recedes warmly behind the line */
+
+  /* ── Typography ───────────────────────────────────────────────────── */
+
+  --font-body: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+                            /* the workhorse — everything non-technical */
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+                            /* the technical voice — stats, dimensions, codes, debug output */
+
+  /* ── Spacing rhythm — 8-point scale ───────────────────────────────── */
+  /*
+   * A small set of values reused consistently. Density comes from tightening
+   * the steps used, not from inventing new ones. Surface files declare which
+   * steps a surface lives on.
+   */
+
+  --space-1: 4px;           /* hairline gaps — touching elements that need a breath */
+  --space-2: 8px;           /* tight pairings — label and its element */
+  --space-3: 12px;          /* contained content padding */
+  --space-4: 16px;          /* default rhythm step — most relationships */
+  --space-5: 24px;          /* sections within a frame */
+  --space-6: 32px;          /* between frames */
+  --space-7: 48px;          /* between major composition zones */
+  --space-8: 64px;          /* generous separation — used sparingly */
+  --space-9: 96px;          /* hero-scale breathing room */
+}
+
+[data-theme="dark"] {
+  --bg: #111111;            /* inverted anchor — same warmth, opposite charge */
+  --fg: #F2EEE3;            /* off-white carrying body, marks, structural lines */
+  --mute: #A8A39A;          /* lifted warm grey — keeps the secondary voice readable in dark */
+  --hairline: rgba(242, 238, 227, 0.30);
+                            /* same hairline math, inverted */
+  --hairline-soft: rgba(242, 238, 227, 0.12);
+                            /* even quieter — within-card item dividers, inverted */
+  --accent: #B89AAA;        /* light dusty rose — same hue, lifted for dark-bg visibility */
+
+  --icon-primary: var(--fg);
+  --icon-secondary: var(--mute);
+}

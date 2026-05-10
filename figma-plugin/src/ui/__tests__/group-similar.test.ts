@@ -1,0 +1,96 @@
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import { groupSimilar } from '../group-similar.ts'
+import type { Finding } from '../../checks/findings.ts'
+
+const flag = (
+  criterion: string,
+  nodeId: string,
+  nodeName: string,
+  details: Record<string, unknown> = {}
+): Finding => ({
+  criterion,
+  status: 'flag',
+  scope: 'element',
+  nodeId,
+  nodeName,
+  message: 'm',
+  details,
+})
+
+test('1.4.3 — identical actual+required collapses', () => {
+  const findings = [
+    flag('1.4.3', 'a', 'Forgot password?', { actual: 2.1, required: 4.5 }),
+    flag('1.4.3', 'b', 'Submit',           { actual: 2.1, required: 4.5 }),
+    flag('1.4.3', 'c', 'Other',            { actual: 3.0, required: 4.5 }),
+  ]
+  const groups = groupSimilar(findings)
+  assert.equal(groups.length, 2)
+  assert.equal(groups[0].members.length, 2)
+  assert.deepEqual(
+    groups[0].nodes.map(n => n.name),
+    ['Forgot password?', 'Submit']
+  )
+  assert.equal(groups[1].members.length, 1)
+})
+
+test('1.4.11 — same numeric tuple collapses across nodes', () => {
+  const findings = [
+    flag('1.4.11', 'a', 'Btn 1', { actual: 2.4, required: 3 }),
+    flag('1.4.11', 'b', 'Btn 2', { actual: 2.4, required: 3 }),
+  ]
+  const groups = groupSimilar(findings)
+  assert.equal(groups.length, 1)
+  assert.equal(groups[0].nodes.length, 2)
+})
+
+test('1.4.12 — same property+actual+required collapses', () => {
+  const findings = [
+    flag('1.4.12', 'a', 'Body', { property: 'line-height', actual: '120%', required: '≥150%' }),
+    flag('1.4.12', 'b', 'Caption', { property: 'line-height', actual: '120%', required: '≥150%' }),
+    flag('1.4.12', 'c', 'Other', { property: 'letter-spacing', actual: '0%', required: '≥12%' }),
+  ]
+  const groups = groupSimilar(findings)
+  assert.equal(groups.length, 2)
+  assert.equal(groups[0].members.length, 2)
+})
+
+test('3.3.2 — same flag message collapses', () => {
+  const findings = [
+    flag('3.3.2', 'a', 'Email', {}),
+    flag('3.3.2', 'b', 'Password', {}),
+  ]
+  // Both have identical message "m" → collapse.
+  const groups = groupSimilar(findings)
+  assert.equal(groups.length, 1)
+})
+
+test('Variant findings always stay singleton', () => {
+  const findings = [
+    flag('1.4.1', null as unknown as string, 'C', {}),
+    flag('1.4.1', null as unknown as string, 'C', {}),
+  ]
+  const groups = groupSimilar(findings)
+  assert.equal(groups.length, 2)
+})
+
+test('Order of groups follows first appearance', () => {
+  const findings = [
+    flag('1.4.3', 'a', 'A', { actual: 1, required: 4.5 }),
+    flag('1.4.3', 'b', 'B', { actual: 2, required: 4.5 }),
+    flag('1.4.3', 'c', 'C', { actual: 1, required: 4.5 }),
+  ]
+  const groups = groupSimilar(findings)
+  assert.equal(groups.length, 2)
+  assert.deepEqual(groups[0].members.map(m => m.nodeName), ['A', 'C'])
+  assert.deepEqual(groups[1].members.map(m => m.nodeName), ['B'])
+})
+
+test('Findings with non-numeric actual/required stay singleton (key returns null)', () => {
+  const findings = [
+    flag('1.4.3', 'a', 'A', { actual: 'unknown' }),
+    flag('1.4.3', 'b', 'B', { actual: 'unknown' }),
+  ]
+  const groups = groupSimilar(findings)
+  assert.equal(groups.length, 2)
+})

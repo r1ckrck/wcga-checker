@@ -1,0 +1,17 @@
+{
+  "name": "WCAG AA Auditor",
+  "id": "wcag-aa-auditor-dev",
+  "api": "1.0.0",
+  "main": "dist/main.js",
+  "ui": "dist/ui.html",
+  "editorType": ["figma", "dev"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": [
+      "https://openrouter.ai",
+      "https://api.anthropic.com",
+      "https://generativelanguage.googleapis.com"
+    ],
+    "reasoning": "Calls a user-configured AI provider (OpenRouter, Anthropic, or Google) for two AI-augmented WCAG checks (visual review and image-of-text). The API key is held in figma.clientStorage and never leaves the user's machine except as the Authorization header on these requests."
+  }
+}

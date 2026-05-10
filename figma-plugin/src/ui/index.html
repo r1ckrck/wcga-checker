@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WCAG AA Auditor</title>
+    <style>/* INLINE_CSS */</style>
+  </head>
+  <body>
+    <!-- INLINE_PHOSPHOR_SPRITE -->
+    <div class="frame">
+      <header class="role-label">
+        <span class="role-label__text">wcag aa auditor</span>
+        <span class="role-label__hairline"></span>
+        <button
+          class="ai-indicator"
+          id="ai-indicator"
+          type="button"
+          aria-pressed="false"
+          title="AI status — click to toggle, or open settings if not yet configured"
+        >
+          <span class="ai-indicator__label">AI:</span>
+          <span class="ai-indicator__state" id="ai-indicator-state">not set up</span>
+        </button>
+        <button
+          class="header__cog"
+          id="settings-cog"
+          type="button"
+          aria-label="AI settings"
+          title="AI settings"
+        >
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-cog"/></svg>
+        </button>
+      </header>
+
+      <main class="main" id="main">
+        <!-- Selected pane — reflects what's currently picked in Figma. Updates
+             live with selection changes. Independent of the audit results. -->
+        <section class="selected-block" aria-live="polite">
+          <div class="selected-block__header">
+            <span class="selected-block__index">01</span>
+            <span class="selected-block__title">Selected</span>
+          </div>
+          <div class="hero-row">
+            <h1 class="hero__title" id="hero-title">No selection</h1>
+            <div class="action">
+              <button class="btn" id="run-btn" type="button" disabled>
+                <span class="btn__label" id="run-btn-label">Run audit</span>
+              </button>
+            </div>
+          </div>
+          <p class="hero__meta" id="hero-meta">Select a component, instance, or frame to audit.</p>
+          <p class="selected-block__warning" id="selected-warning" hidden>
+            Running this will replace the current results below.
+          </p>
+        </section>
+
+        <!-- Results pane — stays sticky on the audited component. Doesn't
+             update when the user changes selection in Figma; only refreshes
+             when the user explicitly re-runs the audit. -->
+        <section class="results" id="results">
+          <div class="results__header">
+            <span class="results__index">02</span>
+            <span class="results__title">
+              <span class="results__title-text">Results</span>
+              <span class="results__title-meta" id="results-title-meta" hidden></span>
+            </span>
+            <span class="results__stats" id="results-stats" hidden></span>
+            <button
+              class="btn-secondary"
+              id="copy-debug-btn"
+              type="button"
+              hidden
+              aria-label="Copy debug report to clipboard"
+            >
+              <span class="btn-secondary__label">Copy debug</span>
+            </button>
+          </div>
+          <div class="results__body" id="results-body">
+            <p class="results__empty">Run an audit to see findings.</p>
+          </div>
+        </section>
+      </main>
+
+      <!-- Settings page — full-panel swap. Hidden until the cog or the
+           "needs setup" indicator opens it. When visible, #main is hidden;
+           when hidden, #main is visible. The vertical slot is shared. -->
+      <section class="settings-page" id="settings-page" hidden aria-labelledby="settings-page-title">
+        <header class="settings-page__header">
+          <h2 class="settings-page__title" id="settings-page-title">AI settings</h2>
+          <button class="settings-page__close" id="settings-close" type="button" aria-label="Close settings">×</button>
+        </header>
+
+        <div class="settings-page__body">
+          <div class="settings-tabs" role="tablist" aria-label="AI provider">
+            <button class="settings-tab" data-provider="openrouter" role="tab" aria-selected="true" type="button">OpenRouter</button>
+            <button class="settings-tab" data-provider="anthropic" role="tab" aria-selected="false" type="button">Anthropic</button>
+            <button class="settings-tab" data-provider="google" role="tab" aria-selected="false" type="button">Google</button>
+          </div>
+
+          <p class="settings-caveat" id="settings-caveat" hidden>
+            Heads up — Google's API CORS support has been inconsistent from browser contexts.
+            If calls fail with a network error, route through OpenRouter instead.
+          </p>
+
+          <label class="settings-field">
+            <span class="settings-field__label">API key</span>
+            <input
+              class="settings-field__input"
+              id="settings-key"
+              type="password"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="sk-or-v1-…"
+            />
+            <span class="settings-field__hint" id="settings-key-hint">
+              Stored locally in figma.clientStorage. Never sent anywhere except the provider above.
+            </span>
+          </label>
+
+          <label class="settings-field">
+            <span class="settings-field__label">Model</span>
+            <select class="settings-field__input" id="settings-model"></select>
+          </label>
+
+          <div class="settings-actions">
+            <button class="btn-secondary settings-actions__clear" id="settings-clear" type="button" hidden>
+              <span class="btn-secondary__label" id="settings-clear-label">Clear key</span>
+            </button>
+            <span class="settings-actions__spacer"></span>
+            <button class="btn-secondary" id="settings-cancel" type="button">
+              <span class="btn-secondary__label">Cancel</span>
+            </button>
+            <button class="btn" id="settings-save" type="button" disabled>
+              <span class="btn__label">Save</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span class="footer__slug" id="footer-slug">wcag-checker · r1ckrck · v0</span>
+        <span class="footer__monogram" aria-hidden="true">/* INLINE_MONOGRAM */</span>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <script>/* INLINE_JS */</script>
+  </body>
+</html>

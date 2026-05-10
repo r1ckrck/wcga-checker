@@ -1,0 +1,2073 @@
+/* ──────────────────────────────────────────────────────────────────
+ * Web fonts — base64 woff2 inlined at build time (see scripts/build.mjs).
+ * The plugin iframe can't fetch external files, so the bytes ship with
+ * the HTML. Source files live in assets/fonts/.
+ * ─────────────────────────────────────────────────────────────────*/
+
+/* INLINE_FONTS */
+
+/* ──────────────────────────────────────────────────────────────────
+ * Tokens — mirrored from assets/tokens.css.
+ * Single source of truth lives in assets/; this copy ships in the
+ * inlined ui.html. Keep them in sync (build script verifies).
+ * ─────────────────────────────────────────────────────────────────*/
+
+:root {
+  --bg: #f2eee3;
+  --fg: #111111;
+  --mute: #7a7569;
+  --hairline: rgba(31, 31, 31, 0.3);
+  --hairline-soft: rgba(31, 31, 31, 0.12);
+  --accent: #5c3f4e;
+
+  --icon-primary: var(--fg);
+  --icon-secondary: var(--mute);
+
+  --font-body: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* Plugin-specific derived tokens */
+  --btn-bg: var(--fg);
+  --btn-fg: var(--bg);
+  --btn-bg-disabled: rgba(31, 31, 31, 0.12);
+  --btn-fg-disabled: var(--mute);
+  --focus-ring: rgba(31, 31, 31, 0.4);
+
+  /* Layout rhythm */
+  --card-gap: var(--space-1);   /* spacing between cards (and around the
+                                   manual note) — keep tight so the report
+                                   reads as one continuous surface */
+  --section-divider-gap: var(--card-gap);
+                                /* equal space above and below the hairline
+                                   that separates the audit results from the
+                                   DTO inspector — matches inter-card spacing
+                                   so the rhythm stays uniform */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111111;
+    --fg: #f2eee3;
+    --mute: #a8a39a;
+    --hairline: rgba(242, 238, 227, 0.3);
+    --hairline-soft: rgba(242, 238, 227, 0.12);
+    --accent: #b89aaa;
+
+    --btn-bg: var(--fg);
+    --btn-fg: var(--bg);
+    --btn-bg-disabled: rgba(242, 238, 227, 0.12);
+    --btn-fg-disabled: var(--mute);
+    --focus-ring: rgba(242, 238, 227, 0.4);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────
+ * Reset
+ * ─────────────────────────────────────────────────────────────────*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* The HTML `hidden` attribute sets display: none via the user-agent
+ * stylesheet, but any explicit `display: flex / grid / block` rule on the
+ * same element overrides it. We toggle visibility via the `hidden`
+ * attribute throughout (settings page, #main, AI section bodies, etc.),
+ * so this global rule restores the intended semantic — `hidden` always
+ * wins. Avoids the trap where adding a new layout rule silently breaks
+ * a component's hidden state. */
+[hidden] {
+  display: none !important;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+ * Frame — the plugin chrome
+ * ─────────────────────────────────────────────────────────────────*/
+
+.frame {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  gap: var(--space-4);
+}
+
+/* ── Role label (top-left, italic, mono motif) ──────────────────── */
+
+.role-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--mute);
+  letter-spacing: 0.01em;
+  /* min-width: 0 lets this flex container shrink within its parent so the
+   * children with their own `min-width: 0` can in turn collapse — without
+   * this, a long status string would push the header past the panel edge. */
+  min-width: 0;
+}
+
+.role-label__text {
+  flex-shrink: 0;
+}
+
+.role-label__hairline {
+  flex: 1 1 0;
+  /* Allow the hairline to fully collapse to zero so the controls on its right
+   * keep their full size on narrow widths. */
+  min-width: 0;
+  height: 1px;
+  background: var(--hairline);
+}
+
+.role-label__status {
+  flex-shrink: 1;
+  /* Truncation safety net: if the status text ever exceeds the available
+   * inline budget (e.g. a verbose down-reason), it ellipsizes instead of
+   * forcing a horizontal scroll. The tooltip carries the full text. */
+  min-width: 0;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--mute);
+  text-transform: lowercase;
+}
+
+/* AI status indicator — small mono pill in the header. Three states:
+ *  - needs-setup → "AI: not set up", click opens settings
+ *  - on          → "AI: on", click toggles to off (key stays saved)
+ *  - off         → "AI: off", click toggles to on
+ *
+ * Visual treatment is a quiet mono pill (preserves the header rhythm);
+ * key presence + aiEnabled together drive the state derivation.
+ */
+
+.ai-indicator {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 18px;
+  padding: 0 var(--space-2);
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--mute);
+  text-transform: lowercase;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+.ai-indicator:hover,
+.ai-indicator:focus-visible {
+  color: var(--fg);
+  border-color: var(--fg);
+  outline: none;
+}
+
+.ai-indicator:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.ai-indicator__label {
+  color: inherit;
+}
+
+.ai-indicator__state {
+  color: inherit;
+  font-weight: 500;
+}
+
+/* Needs-setup state — claims the accent moment so the user can't miss
+ * that they need to add a key before AI features work. */
+.ai-indicator--needs-setup {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.ai-indicator--needs-setup:hover,
+.ai-indicator--needs-setup:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Off state — neutral but clearly distinct from On. */
+.ai-indicator--off {
+  color: var(--fg);
+  border-color: var(--hairline);
+}
+
+/* Cog button — always present in the header, always opens settings. Sized
+ * to the same 18px row height as the indicator so the header stays tidy. */
+.header__cog {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--mute);
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+.header__cog .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.header__cog:hover,
+.header__cog:focus-visible {
+  color: var(--fg);
+  outline: none;
+}
+
+.header__cog:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ── Main column ────────────────────────────────────────────────── */
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ── Selected block (current selection + Run-audit CTA) ──────────── */
+
+.selected-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.selected-block__header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.selected-block__index {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--mute);
+}
+
+.selected-block__title {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+/* Replace-warning that appears under the CTA when re-running would
+ * discard a current audit. Mute italic so it reads as a hint, not a flag. */
+.selected-block__warning {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--mute);
+  margin: var(--space-1) 0 0;
+}
+
+/* ── Hero row (truncated name + CTA, single line) ──────────────── */
+/* Only the title and the CTA share row space. The meta / error / warning
+   paragraphs live as siblings outside this row so they get the full panel
+   width and don't wrap under the CTA's empty column. */
+
+.hero-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.hero-row .hero__title {
+  flex: 1;
+}
+
+.hero__title {
+  /* Selected name is data, not a hero per assets/design.md (display is
+     reserved for one moment per piece — the sign-off monogram). General Sans
+     here, single-line ellipsis so the section height doesn't track name length. */
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  color: var(--fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.hero__meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--mute);
+  /* Up to two lines, then ellipsize. Empty-state copy and unsupported-state
+     `<type> · <error>` strings can both be longer than the panel width;
+     letting them wrap to a second line keeps them readable while still
+     bounding the section's height. The full string lives in the title attr. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 100%;
+  min-width: 0;
+  word-break: break-word;
+}
+
+/* ── Action (CTA only, right-aligned at top of hero-block) ─────── */
+
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 var(--space-4);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 0;
+  transition: background 120ms ease;
+}
+
+.btn:not(:disabled):hover,
+.btn:not(:disabled):focus-visible {
+  background: var(--accent);
+  color: var(--bg);
+  outline: none;
+}
+
+.btn:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  background: var(--btn-bg-disabled);
+  color: var(--btn-fg-disabled);
+  cursor: not-allowed;
+}
+
+.btn__label {
+  display: inline-block;
+}
+
+/* ── Results / Manual sections ──────────────────────────────────── */
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  /* Extra breathing room between Section 1 (Selected) and Section 2 (Results)
+     so the user can anchor on each as a distinct zone. */
+  margin-top: var(--space-2);
+}
+
+.results__header {
+  display: flex;
+  /* Center-align so the icon stats on the right vertically center against the
+     title text on the left. The Copy-debug button no longer lives here, so
+     the row is consistently single-text-height. */
+  align-items: center;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.results__index {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--mute);
+}
+
+.results__title {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Audited-component name, appended after the "Results" word. Lowercase,
+ * mute, mono — distinct from the section heading itself so the eye reads
+ * "RESULTS — header" cleanly. */
+.results__title-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--mute);
+  margin-left: var(--space-1);
+}
+
+.results__title-meta[hidden] {
+  display: none;
+}
+
+.results__body {
+  /* No padding — the meta block and individual content sections carry their
+     own spacing. Tightens the gap between the section hairline and the stats
+     row. min-height keeps the empty state from collapsing. */
+  padding: 0;
+  min-height: 64px;
+}
+
+.results__empty {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--mute);
+  font-style: italic;
+}
+
+.results__mock {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--fg);
+  padding: var(--space-3);
+  border: 1px solid var(--hairline);
+  background: transparent;
+  word-break: break-word;
+}
+
+.results__mock--error {
+  color: var(--mute);
+  font-style: italic;
+}
+
+.results__mock--error::before {
+  content: 'error · ';
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Stats cluster sits in the section header (right side of the title row).
+ * The legacy `.results__meta-block` row that used to live under the header
+ * is gone — type and dimensions are inlined into the title meta. */
+.results__stats {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.results__stats[hidden] {
+  display: none;
+}
+
+.results__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg);
+}
+
+.results__stat-count {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Phosphor duotone icon. The wrapping element's `color` drives both paths:
+   the outline uses currentColor, the secondary fill uses currentColor with
+   per-path opacity (typically 0.2). One color setting → duotone effect. */
+.icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--icon-primary);
+}
+
+.phosphor-sprite {
+  display: none;
+}
+
+.findings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border: 1px solid var(--hairline);
+  padding: var(--space-3);
+  margin-bottom: var(--card-gap);
+}
+
+.findings__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.findings__title {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.findings__count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--mute);
+}
+
+.findings__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.findings__item {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  gap: var(--space-1) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.findings__node {
+  font-family: var(--font-mono);
+  color: var(--fg);
+}
+
+.findings__message {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--fg);
+}
+
+.findings__item--warn {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--mute);
+}
+
+/* ── Grouped findings (UX Pass A2) ──────────────────────────────────── */
+
+.findings-groups {
+  display: flex;
+  flex-direction: column;
+  /* Both flex `gap` AND child `margin-bottom` apply; using the same token for
+   * the gap keeps inter-card spacing consistent with siblings outside this
+   * wrapper (AI sections, variant section, etc). */
+  gap: var(--card-gap);
+  margin-bottom: var(--card-gap);
+}
+
+.findings-groups__empty {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--mute);
+  margin: 0;
+  padding: var(--space-2) 0;
+}
+
+.findings-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border: 1px solid var(--hairline);
+  padding: var(--space-3);
+}
+
+.findings-group__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+  min-width: 0;
+}
+
+.findings-group__title {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.findings-group__counts {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--mute);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.findings-group__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.findings-group__subhead {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mute);
+  margin: 0;
+  padding-top: var(--space-1);
+}
+
+.findings-group__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.findings-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--fg);
+  min-width: 0;
+}
+
+.findings-row__name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Clickable name → purple, the only "clickable" affordance in the findings UI.
+   Click sends select-node to the main thread (Figma selects + zooms). */
+button.findings-row__name--clickable {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-align: left;
+  color: var(--accent);
+  cursor: pointer;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  border-radius: 0;
+}
+
+button.findings-row__name--clickable:hover {
+  text-decoration: underline;
+}
+
+button.findings-row__name--clickable:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: 2px;
+  text-decoration: underline;
+}
+
+.findings-row__metric {
+  flex: 1 1 auto;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.findings-row__star {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--mute);
+  flex-shrink: 0;
+}
+
+.findings-row__hint {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--fg);
+  word-break: break-word;
+}
+
+/* Flag metric is plain --fg now. Flag-ness is signaled by section position
+   (rendered under the "Flagged" subhead) and by the surrounding row context.
+   Purple is reserved for clickable affordances only. */
+.findings-row--flag .findings-row__metric {
+  color: var(--fg);
+}
+
+.findings-row--unable .findings-row__metric,
+.findings-row--manual .findings-row__hint {
+  color: var(--mute);
+}
+
+.findings-row__info {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--mute);
+  cursor: pointer;
+  line-height: 1.45;
+  border-radius: 0;
+}
+
+.findings-row__info:hover,
+.findings-row__info:focus-visible {
+  color: var(--fg);
+  outline: none;
+}
+
+.findings-row__info:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.findings-row__info[aria-expanded="true"] {
+  color: var(--fg);
+}
+
+.findings-row__criterion {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--mute);
+  flex-basis: 100%;
+  padding-top: 2px;
+}
+
+.findings-row__criterion[hidden] {
+  display: none;
+}
+
+/* Compact note — slim italic single-line treatment for inclusive-instructions
+   (typically just 1.3.3 Sensory Characteristics). No header, no border. */
+.findings-note {
+  margin: 0;
+  padding: 0;
+}
+
+.findings-note__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  margin: 0;
+  padding: var(--space-1) 0;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--mute);
+}
+
+.findings-note__star {
+  font-style: normal;
+  flex-shrink: 0;
+}
+
+.findings-note__hint {
+  flex: 1 1 auto;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.findings-note .findings-row__info {
+  font-style: normal;
+}
+
+/* ── Secondary button (Copy debug, etc.) ────────────────────────────── */
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 0 var(--space-3);
+  background: transparent;
+  color: var(--mute);
+  border: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 0;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus-visible {
+  color: var(--fg);
+  border-color: var(--fg);
+  outline: none;
+}
+
+.btn-secondary:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.btn-secondary[hidden] {
+  display: none;
+}
+
+.results__header .btn-secondary {
+  margin-left: auto;
+  align-self: center;
+}
+
+/* ── Toast (transient confirmation pill) ────────────────────────────── */
+
+.toast {
+  position: fixed;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--space-2) var(--space-4);
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.toast[hidden] {
+  display: none;
+}
+
+.toast--error {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* ── Variant audit (collapsed-bar pattern, mirrors AI sections) ─────── */
+
+.variant-section {
+  border: 1px solid var(--hairline);
+  /* Match the effective spacing between group cards inside .findings-groups,
+     which is gap(4) + group-card margin-bottom(4) = 8px. Sibling sections
+     outside that wrapper need a single 8px margin to read at the same rhythm. */
+  margin-bottom: var(--space-2);
+}
+
+.variant-section__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.variant-section__title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--fg);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* Subtext sits on its own row, divided from the title/button row by a
+ * hairline. Mirrors the divider rhythm of the group cards. */
+.variant-section__hint {
+  margin: 0;
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--mute);
+  line-height: 1.45;
+}
+
+.variant-section__btn {
+  flex-shrink: 0;
+}
+
+.variant-section__btn:disabled {
+  cursor: progress;
+  color: var(--mute);
+  border-color: var(--hairline);
+}
+
+.variant-section__body:empty {
+  display: none;
+}
+
+.variant-section__body:not(:empty) {
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border-top: 1px solid var(--hairline);
+}
+
+.variant-section__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+}
+
+/* ── AI sections — collapsible, per-section override ────────────────── */
+
+.ai-section {
+  border: 1px solid var(--hairline);
+  /* Same 8px sibling rhythm as variant-section (matches the gap+margin total
+     between group cards inside .findings-groups). */
+  margin-bottom: var(--space-2);
+}
+
+/* Title typography unified across all sections (group cards, AI sections,
+ * variant section, DTO inspector). Mono 11px uppercase, drafting voice. */
+
+.ai-section__details {
+  padding: var(--space-3);
+}
+
+.ai-section__summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+
+.ai-section__summary::-webkit-details-marker {
+  display: none;
+}
+
+.ai-section__summary::marker {
+  content: '';
+}
+
+.ai-section__title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg);
+}
+
+.ai-section__count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--mute);
+}
+
+.ai-section__details[open] > .ai-section__summary {
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: var(--space-2);
+}
+
+.ai-section__body {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--fg);
+  padding: var(--space-1) 0 0;
+}
+
+.ai-section__body--error {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--mute);
+  font-style: italic;
+}
+
+.ai-section__disclaimer {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--mute);
+  margin: 0 0 var(--space-2);
+}
+
+.ai-section__inner {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--fg);
+}
+
+.ai-section__inner--quiet {
+  font-style: italic;
+  color: var(--mute);
+}
+
+.ai-section__inner--error {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--mute);
+  font-style: italic;
+}
+
+/* AI off — closed bar with "Run with AI" override. */
+.ai-section--off {
+  padding: 0;
+}
+
+.ai-section__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+}
+
+.ai-section__off-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mute);
+  flex: 1 1 auto;
+}
+
+.ai-section__run-btn {
+  flex-shrink: 0;
+}
+
+/* Image-of-text rows reuse `.finding-item` from the group-card template — see
+ * findings-render.ts → buildFindingItem and the matching CSS above. The only
+ * extra rule needed is the dotted between-row separator scoped to the AI
+ * section's body, mirroring the group-card body. */
+.ai-section--image-of-text .ai-section__body > .finding-item:not(:first-child) {
+  border-top: 1px dotted var(--hairline-soft);
+  padding-top: var(--space-3);
+}
+
+/* When the section opens with the static "N flagged" header, the first
+ * .finding-item below it also picks up the dotted separator. */
+.ai-section--image-of-text .ai-section__body > .flagged-header + .finding-item {
+  border-top: 1px dotted var(--hairline-soft);
+  padding-top: var(--space-3);
+}
+
+/* Visual Review result rows */
+.visual-review__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.visual-review__item {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--fg);
+  line-height: 1.45;
+}
+
+/* DTO inspector — same card chrome as everything else, with a bar layout
+ * that mirrors the variant section: title left, Copy debug button right,
+ * always visible. The disclosure body holds the JSON pre. */
+.results__details {
+  border: 1px solid var(--hairline);
+  /* DTO inspector is the last card. No bottom margin — the frame's own
+   * padding handles the gap to the panel edge, and we want that gap to
+   * stay tight, not double-up with a card margin. */
+  margin-bottom: 0;
+  color: var(--fg);
+}
+
+.results__details > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+
+.results__details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.results__details > summary::marker {
+  content: '';
+}
+
+.results__details__title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg);
+  flex-shrink: 0;
+}
+
+.results__details[open] > summary {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.results__json {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--fg);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: transparent;
+  max-height: 320px;
+  overflow: auto;
+  white-space: pre;
+  word-break: normal;
+}
+
+/* ── Footer (slug + monogram, drafting bottom margin) ───────────── */
+
+.footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--hairline);
+}
+
+.footer__slug {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--mute);
+}
+
+.footer__monogram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.footer__monogram svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Scrollbar polish (subtle, drafting-quiet, only when window caps out) ── */
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--hairline);
+  border-radius: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+ * Findings redesign — card-based output
+ * Per the redesign plan: one card per WCAG group, items inside the
+ * card carry visual primitives (swatches / bar / label rows / etc.)
+ * with compact numerics + a severity dot. Element names are inline
+ * hyperlinks. Pass entries collapse into a single disclosure per
+ * group. Unable-to-test renders as italic mute footer notes.
+ * ─────────────────────────────────────────────────────────────────*/
+
+.group-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--hairline);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  margin-bottom: var(--card-gap);
+}
+
+.group-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: var(--space-3);
+}
+
+.group-card__stats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.group-card__title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--fg);
+}
+
+.group-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── Finding item (one entry inside a card) ─────────────────────── */
+
+.finding-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Within-card boundary between sibling items. Quieter than the group
+ * header underline so the visual hierarchy stays correct: header is
+ * solid, item separators are dotted-soft. */
+.group-card__body > .finding-item:not(:first-child) {
+  border-top: 1px dotted var(--hairline-soft);
+  padding-top: var(--space-3);
+}
+
+.finding-item__title-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.finding-item__title {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+  letter-spacing: 0.005em;
+}
+
+.finding-item__code {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--mute);
+}
+
+.finding-item__names {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--fg);
+  word-break: break-word;
+  line-height: 1.45;
+}
+
+.finding-item__name-sep {
+  color: var(--mute);
+}
+
+/* ── Per-criterion visual primitives ────────────────────────────── */
+
+.finding-item__visual {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.finding-item__visual--label {
+  gap: var(--space-1);
+}
+
+.finding-item__visual--spacing {
+  gap: var(--space-1);
+}
+
+.finding-item__numerics {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--mute);
+}
+
+.finding-item__numerics--bare {
+  justify-content: flex-end;
+}
+
+.finding-item__numerics-text {
+  flex: 1;
+}
+
+/* ── 1.4.3 / 1.4.11 — color swatches + numerics on the right ─────── */
+
+/* Override the visual's default vertical stack: contrast lays out the
+ * swatches block on the left and the current/needs numerics on the right. */
+.finding-item__visual--contrast {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.contrast-left {
+  /* Two-row grid:
+   *   row 1 — fg-swatch · "on" · bg-swatch
+   *   row 2 — fg-hex   · (gap) · bg-hex
+   * Columns size to max-content so the hex (which is wider than the swatch)
+   * sets the column width; both swatch and hex are then centered within
+   * their column, keeping the hex visibly anchored under its swatch.
+   * align-items: start so a single-line hex stays anchored at the top of
+   * row 2 when the sibling column has two lines (hex + opacity). The "on"
+   * label opts back into vertical centering against the swatches via
+   * `align-self: center`.
+   * flex-shrink: 0 so the right-side numerics don't squeeze this block. */
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  column-gap: var(--space-2);
+  row-gap: var(--space-1);
+  align-items: start;
+  flex-shrink: 0;
+}
+
+.contrast-right {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  /* Top-align the numerics block with the swatches above; the dot anchors
+   * to the same baseline so the row reads as one tidy band. */
+  padding-top: var(--space-1);
+}
+
+.contrast-numerics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.contrast-numerics__line {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.contrast-numerics__label {
+  display: inline-block;
+  width: 48px;
+  color: var(--mute);
+}
+
+.contrast-numerics__value {
+  color: var(--fg);
+}
+
+.contrast-on {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--mute);
+  /* Sits in row 1 between the swatches; its row-2 counterpart is the empty
+   * .contrast-on-spacer span (kept in DOM purely to preserve grid alignment).
+   * align-self: center pulls it back to the swatches' vertical midline since
+   * the grid defaults to top-alignment. */
+  justify-self: center;
+  align-self: center;
+}
+
+.contrast-on-spacer {
+  /* No content — exists only to fill grid row 2 / col 2 so the bg-hex stays
+   * in its column. Zero size, no border, no background. */
+  display: block;
+  width: 0;
+  height: 0;
+}
+
+.swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--hairline);
+  flex-shrink: 0;
+  justify-self: center;
+}
+
+.swatch--empty {
+  background: transparent;
+  background-image:
+    linear-gradient(45deg, var(--hairline) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--hairline) 25%, transparent 25%);
+  background-size: 8px 8px;
+}
+
+.swatch__label {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.contrast-hex {
+  /* Vertical stack: hex on line 1, opacity (when present) on line 2.
+   * Centered under its swatch via `justify-self: center` from .contrast-left. */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: var(--mute);
+  justify-self: center;
+  white-space: nowrap;
+}
+
+.contrast-hex__hex {
+  color: var(--mute);
+}
+
+.contrast-hex__alpha {
+  /* Quieter than the hex itself — same family/size, slightly receded so the
+   * eye reads "this is a modifier" without being shouted at. */
+  color: var(--mute);
+  opacity: 0.7;
+}
+
+/* ── 1.4.12 — spacing bar ───────────────────────────────────────── */
+
+.spacing__label {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--fg);
+}
+
+.spacing-bar {
+  position: relative;
+  width: 80px;
+  height: 6px;
+  background: transparent;
+  border: 1px solid var(--hairline);
+  flex-shrink: 0;
+}
+
+.spacing-bar--empty {
+  border-style: dashed;
+}
+
+.spacing-bar__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: var(--mute);
+}
+
+.spacing-bar__tick {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--fg);
+}
+
+/* ── 3.3.2 — Currently / Needed label rows ──────────────────────── */
+
+.label-row {
+  display: flex;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--fg);
+}
+
+.label-row__label {
+  flex-shrink: 0;
+  width: 64px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--mute);
+  text-transform: lowercase;
+  padding-top: 2px;
+}
+
+.label-row__value {
+  flex: 1;
+  word-break: break-word;
+}
+
+/* ── Severity dot ───────────────────────────────────────────────── */
+
+.severity-dot {
+  display: inline-block;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Three tiers, differentiated by both color/opacity AND size so the gradient
+ * mild → moderate → severe reads at a glance. Severe gets a halo ring (same
+ * accent, bigger footprint) so it's unmistakable. */
+.severity-dot--mild {
+  width: 6px;
+  height: 6px;
+  background: var(--mute);
+}
+
+.severity-dot--moderate {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  opacity: 0.85;
+}
+
+.severity-dot--severe {
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  /* Halo ring at the same accent — doubles the dot's visual footprint
+   * without spawning a new color. Box-shadow used because outline doesn't
+   * follow the border-radius reliably across renderers. */
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--accent);
+}
+
+/* ── Flagged section header ─────────────────────────────────────── */
+/* Static counterpart to the pass-disclosure summary: same typography, no
+ * chevron, no toggle. Sits at the top of a group-card body when there's at
+ * least one flagged finding to label the items below as "flagged". */
+.flagged-header {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--mute);
+  /* Top breathing room kept; bottom collapsed so the dotted top-border on
+   * the first finding-item sits snug under the label. */
+  padding: var(--space-1) 0 0;
+}
+
+/* Inline icon wrapper used in flagged / passed / not-testable section labels.
+ * Keeps the parens hugging the icon and centers the SVG against the baseline
+ * of the surrounding text. The icon glyph itself reuses .icon sizing. */
+.section-label__icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  vertical-align: middle;
+}
+
+.section-label__icon .icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* ── Pass disclosure ────────────────────────────────────────────── */
+
+.pass-disclosure {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--mute);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--hairline);
+  margin-top: var(--space-2);
+}
+
+/* When the disclosure is the only thing in the card body (no flagged or
+ * unable items above), drop its top divider — the group header underline
+ * already provides the visual boundary, so a second line is redundant. */
+.group-card__body > .pass-disclosure:first-child,
+.group-card__body > .pass-disclosure:only-child,
+.variant-section__list > .pass-disclosure:first-child,
+.variant-section__list > .pass-disclosure:only-child {
+  border-top: 0;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.pass-disclosure__summary {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  padding: var(--space-1) 0;
+}
+
+.pass-disclosure__summary::-webkit-details-marker {
+  display: none;
+}
+
+.pass-disclosure__summary::before {
+  content: '▸ ';
+  font-family: var(--font-mono);
+  font-size: 10px;
+  margin-right: var(--space-1);
+}
+
+.pass-disclosure[open] > .pass-disclosure__summary::before {
+  content: '▾ ';
+}
+
+.pass-disclosure__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) 0 var(--space-1) var(--space-3);
+}
+
+.pass-disclosure__row {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--mute);
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.pass-disclosure__code {
+  color: var(--fg);
+}
+
+.pass-disclosure__msg {
+  color: var(--mute);
+}
+
+/* Plain-English label for a passing criterion (e.g. "Text contrast").
+   Sits in body font / foreground for emphasis, with the comma-separated
+   element names inheriting the row's mono treatment. */
+.pass-disclosure__label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--fg);
+}
+
+.pass-disclosure__static-name {
+  color: var(--mute);
+}
+
+/* ── Unable-to-test disclosure ───────────────────────────────────── */
+/* Mirrors .pass-disclosure: collapsed summary "N not testable in this group"
+   that expands to per-reason rows with comma-separated clickable names. */
+
+.unable-disclosure {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--mute);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--hairline);
+  margin-top: var(--space-2);
+}
+
+.group-card__body > .unable-disclosure:first-child,
+.group-card__body > .unable-disclosure:only-child {
+  border-top: 0;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.unable-disclosure__summary {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  padding: var(--space-1) 0;
+}
+
+.unable-disclosure__summary::-webkit-details-marker {
+  display: none;
+}
+
+.unable-disclosure__summary::before {
+  content: '▸ ';
+  font-family: var(--font-mono);
+  font-size: 10px;
+  margin-right: var(--space-1);
+}
+
+.unable-disclosure[open] > .unable-disclosure__summary::before {
+  content: '▾ ';
+}
+
+.unable-disclosure__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) 0 var(--space-1) var(--space-3);
+}
+
+.unable-disclosure__row {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--mute);
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+/* Plain-English reason label (e.g. "Background is an image"). Body font /
+   foreground for emphasis; comma-separated element names sit in the row's
+   mono treatment. */
+.unable-disclosure__label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--fg);
+}
+
+.unable-disclosure__static-name {
+  color: var(--mute);
+}
+
+/* ── Manual bottom note (always-on bullet list) ─────────────────── */
+/* Multiple slim italic lines — one per always-applicable manual check
+ * (sensory, auto-updating content, gestures/motion). Sits directly under
+ * the variant audit card; the section divider that follows in the DOM
+ * separates the report from the DTO inspector. */
+
+.manual-bottom-note {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0 0 var(--card-gap);
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--mute);
+  line-height: 1.45;
+}
+
+.manual-bottom-note__line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+/* Section divider — explicit hairline between the audit results and the
+ * DTO inspector card. Asymmetric margins on purpose: small above (sits
+ * close to the manual note that comes before it), larger below (gives the
+ * DTO card visible breathing room from the boundary). */
+.section-divider {
+  height: 1px;
+  background: var(--hairline);
+  margin-top: var(--card-gap);
+  margin-bottom: var(--space-3);
+}
+
+.manual-bottom-note__star {
+  font-style: normal;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+/* ── Node link (clickable element name in finding entries) ──────── */
+
+.node-link {
+  display: inline;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--fg);
+  text-decoration: underline;
+  text-decoration-color: var(--hairline);
+  text-underline-offset: 2px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.node-link:hover,
+.node-link:focus-visible {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+  outline: none;
+}
+
+.node-link:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.node-link--inert {
+  color: var(--mute);
+  text-decoration: none;
+  cursor: default;
+}
+
+
+/* ── Settings page (full-panel swap from header cog) ───────────────── */
+/* When .settings-page is visible, #main is hidden — they're siblings in
+ * .frame and share the same vertical slot. ResizeObserver handles plugin
+ * window height, so no special height plumbing here. */
+
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.settings-page__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.settings-page__title {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin: 0;
+}
+
+.settings-page__close {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--mute);
+  background: transparent;
+  border: 0;
+  padding: 0 var(--space-1);
+  cursor: pointer;
+}
+
+.settings-page__close:hover,
+.settings-page__close:focus-visible {
+  color: var(--fg);
+  outline: none;
+}
+
+.settings-page__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Tabs — segmented control. Uses existing button tokens. Active tab gets
+ * the inverted bg/fg pair; inactive sits quiet with a hairline. */
+.settings-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border: 1px solid var(--hairline);
+}
+
+.settings-tab {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--mute);
+  background: transparent;
+  border: 0;
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.settings-tab + .settings-tab {
+  border-left: 1px solid var(--hairline);
+}
+
+.settings-tab:hover,
+.settings-tab:focus-visible {
+  color: var(--fg);
+  outline: none;
+}
+
+.settings-tab--active {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.settings-tab--active:hover,
+.settings-tab--active:focus-visible {
+  color: var(--bg);
+}
+
+/* Caveat banner (Google CORS). Mute italic — informative, not alarming. */
+.settings-caveat {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--mute);
+  padding: var(--space-2) var(--space-3);
+  border-left: 2px solid var(--hairline);
+}
+
+/* Field group: label / input / hint stacked. */
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.settings-field__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.settings-field__input {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--hairline);
+  padding: var(--space-2) var(--space-3);
+  height: 32px;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.settings-field__input:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: 1px;
+  border-color: var(--fg);
+}
+
+.settings-field__hint {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--mute);
+  line-height: 1.4;
+}
+
+/* Action row — Clear key (left), Cancel + Save (right). */
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--hairline);
+}
+
+.settings-actions__spacer {
+  flex: 1;
+}
+
+/* Armed clear-key button — accent border + label change to surface that the
+ * next click commits. Stays within the one-accent-moment rule because it's
+ * a transient state (auto-resets after 3s) and explicitly invokes the
+ * clickable-affordance role. */
+.settings-actions__clear--armed {
+  border-color: var(--accent);
+  color: var(--accent);
+}
