@@ -7,6 +7,7 @@ export type GroupId =
   | 'color-contrast'
   | 'typography'
   | 'forms-errors'
+  | 'content-links'
   | 'inclusive-instructions'
   | 'other'
 
@@ -14,6 +15,7 @@ export const GROUP_ORDER: readonly GroupId[] = [
   'color-contrast',
   'typography',
   'forms-errors',
+  'content-links',
   'inclusive-instructions',
   'other',
 ] as const
@@ -22,6 +24,7 @@ export const GROUP_TITLES: Record<GroupId, string> = {
   'color-contrast': 'Color & contrast',
   typography: 'Typography',
   'forms-errors': 'Forms & errors',
+  'content-links': 'Content & links',
   'inclusive-instructions': 'Inclusive instructions',
   other: 'Other',
 }
@@ -36,12 +39,17 @@ export const CRITERION_TO_GROUP: Record<string, GroupId> = {
   '1.4.11': 'color-contrast',
 
   '1.4.5': 'typography',
-  '1.4.12': 'typography',
+  // Non-SC: general readability floors (line-height, letter-spacing,
+  // paragraph-spacing). The WCAG SC for spacing (1.4.12) is a user-override
+  // resilience test handled separately by the future reflow runner.
+  'typography': 'typography',
 
   '2.4.7': 'forms-errors',
   '3.3.1': 'forms-errors',
   '3.3.2': 'forms-errors',
   '3.3.3': 'forms-errors',
+
+  '2.4.4': 'content-links',
 
   // Manual-only criteria — surfaced as bullets in the bottom note, never as
   // a group card. Their group assignment exists only so groupForCriterion
@@ -59,13 +67,15 @@ export const CRITERION_TITLES: Record<string, string> = {
   '1.4.3': 'Contrast (Minimum)',
   '1.4.5': 'Images of Text',
   '1.4.11': 'Non-Text Contrast',
-  '1.4.12': 'Text Spacing',
   '2.2.2': 'Pause, Stop, Hide',
+  '2.4.4': 'Link Purpose (In Context)',
   '2.4.7': 'Focus Visible',
   '2.5.1': 'Pointer Gestures',
   '3.3.1': 'Error Identification',
   '3.3.2': 'Labels or Instructions',
   '3.3.3': 'Error Suggestion',
+  // 'typography' is intentionally absent — it's not a WCAG SC and shouldn't
+  // surface a standard reference in the UI.
 }
 
 const warnedUnknown = new Set<string>()

@@ -9,6 +9,7 @@ const baseDTO = (formInputs: FormInputElement[]): AuditDTO => ({
   interactives: [],
   images: [],
   formInputs,
+  clickables: [],
   variants: null,
   warnings: [],
 })

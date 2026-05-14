@@ -24,9 +24,8 @@ const segment = (over: Partial<TextSegment> = {}): TextSegment => ({
   fontSize: 14,
   lineHeightUnit: 'PIXELS',
   lineHeightPx: 21,
-  // Default letter-spacing chosen to satisfy WCAG 1.4.12's 0.12x rule for the
-  // default 14px font (14 * 0.12 = 1.68). Tests that need a failing fixture
-  // override this explicitly.
+  // Default letter-spacing 2px = ~14% of 14px font — comfortably above the
+  // new -6% floor. Tests that need a failing fixture override explicitly.
   letterSpacingPx: 2,
   textCase: 'ORIGINAL',
   textDecoration: 'NONE',
@@ -41,6 +40,10 @@ const text = (over: Partial<TextElement> = {}): TextElement => ({
   characters: 'Hello',
   isSingleLine: over.isSingleLine ?? true,
   isSingleVisualLine: over.isSingleVisualLine ?? true,
+  // Default paragraphSpacing 16px ≈ 76% of the default 21px line-height —
+  // comfortably above the 70% floor. Tests that need a failing fixture
+  // override explicitly.
+  paragraphSpacingPx: over.paragraphSpacingPx ?? 16,
   segments: over.segments ?? [segment()],
   background: { kind: 'unresolvable', reason: 'no-ancestor' },
   bbox: { x: 0, y: 0, width: 100, height: 20 },
@@ -63,70 +66,71 @@ const dto = (over: Partial<AuditDTO> = {}): AuditDTO => ({
   interactives: [],
   images: over.images ?? [],
   formInputs: [],
+  clickables: [],
   variants: null,
   warnings: [],
 })
 
-test('1.4.12: line-height meets 1.5x → pass', () => {
+test('typography: defaults pass (lh=150%, ls=14%, ps=81% of lh)', () => {
   const f = runTypographyCheck(dto({ texts: [text()] }))
-  const r = f.find(x => x.criterion === '1.4.12')
+  const r = f.find(x => x.criterion === 'typography')
   assert.equal(r?.status, 'pass')
 })
 
-test('1.4.12: multi-visual-line text with line-height below 1.5x → flag', () => {
+test('typography: multi-visual-line text with line-height below 75% → flag', () => {
+  // fontSize 14, lineHeightPx 10 → 71% (below the 75% floor)
   const f = runTypographyCheck(
     dto({
       texts: [
         text({
           isSingleLine: false,
           isSingleVisualLine: false,
-          segments: [segment({ lineHeightPx: 18 })],
+          segments: [segment({ lineHeightPx: 10 })],
         }),
       ],
     })
   )
-  const r = f.find(x => x.criterion === '1.4.12')
+  const r = f.find(x => x.criterion === 'typography')
   assert.equal(r?.status, 'flag')
 })
 
-test('1.4.12: soft-wrapped paragraph (no \\n but multi visual lines) still flags low line-height', () => {
+test('typography: soft-wrapped paragraph (no \\n but multi visual lines) still flags low line-height', () => {
   // Long text with no hard breaks but bbox tall enough to wrap visually.
-  // Old logic auto-passed via isSingleLine=true; new logic correctly flags
-  // because isSingleVisualLine is false.
+  // fontSize 14, lineHeightPx 10 → 71% (below the 75% floor)
   const f = runTypographyCheck(
     dto({
       texts: [
         text({
           isSingleLine: true,
           isSingleVisualLine: false,
-          segments: [segment({ lineHeightPx: 18 })],
+          segments: [segment({ lineHeightPx: 10 })],
         }),
       ],
     })
   )
-  const r = f.find(x => x.criterion === '1.4.12')
+  const r = f.find(x => x.criterion === 'typography')
   assert.equal(r?.status, 'flag')
 })
 
-test('1.4.12: truly single-visual-line text auto-passes line-height even when below 1.5x', () => {
-  // Single rendered line — line-height has no rendered effect, so a numeric
-  // shortfall is theoretical only and shouldn't surface as a flag.
+test('typography: truly single-visual-line text auto-passes line-height', () => {
+  // Single rendered line — line-height has no rendered effect, so even a
+  // value below the floor shouldn't surface as a flag.
   const f = runTypographyCheck(
     dto({
       texts: [
         text({
           isSingleLine: true,
           isSingleVisualLine: true,
-          segments: [segment({ lineHeightPx: 18 })],
+          segments: [segment({ lineHeightPx: 8 })],
         }),
       ],
     })
   )
-  const r = f.find(x => x.criterion === '1.4.12')
+  const r = f.find(x => x.criterion === 'typography')
   assert.equal(r?.status, 'pass')
 })
 
-test('1.4.12: AUTO line-height passes (no fixed constraint)', () => {
+test('typography: AUTO line-height passes (no fixed constraint)', () => {
   const f = runTypographyCheck(
     dto({
       texts: [
@@ -136,28 +140,80 @@ test('1.4.12: AUTO line-height passes (no fixed constraint)', () => {
       ],
     })
   )
-  const r = f.find(x => x.criterion === '1.4.12')
+  const r = f.find(x => x.criterion === 'typography')
   assert.equal(r?.status, 'pass')
 })
 
-test('1.4.12: single-line skips paragraph spacing requirement', () => {
+test('typography: negative letter-spacing within -6% floor passes', () => {
+  // fontSize 14, letterSpacing -0.84 → -6% (boundary)
   const f = runTypographyCheck(
     dto({
-      texts: [text({ isSingleLine: true })],
+      texts: [text({ segments: [segment({ letterSpacingPx: -0.84 })] })],
     })
   )
-  // Should not have a paragraph-spacing flag.
+  const r = f.find(x => x.criterion === 'typography')
+  assert.equal(r?.status, 'pass')
+})
+
+test('typography: letter-spacing tighter than -6% → flag', () => {
+  // fontSize 14, letterSpacing -1.5 → -10.7% (below -6%)
+  const f = runTypographyCheck(
+    dto({
+      texts: [text({ segments: [segment({ letterSpacingPx: -1.5 })] })],
+    })
+  )
+  const r = f.find(x => x.criterion === 'typography')
+  assert.equal(r?.status, 'flag')
+})
+
+test('typography: paragraph-spacing below 70% of line-height → flag', () => {
+  // lineHeight 21, paragraphSpacing 10 → 47.6% (below 70%)
+  const f = runTypographyCheck(
+    dto({
+      texts: [
+        text({
+          isSingleLine: false,
+          isSingleVisualLine: false,
+          paragraphSpacingPx: 10,
+        }),
+      ],
+    })
+  )
+  const flags = f.filter(x => x.status === 'flag')
+  const paragraphFlag = flags.find(
+    x => (x.details as { property?: string } | undefined)?.property === 'paragraph-spacing'
+  )
+  assert.ok(paragraphFlag)
+})
+
+test('typography: single-line skips paragraph spacing requirement', () => {
+  const f = runTypographyCheck(
+    dto({
+      texts: [text({ isSingleLine: true, paragraphSpacingPx: 0 })],
+    })
+  )
   const paragraphFlag = f.find(
     x => x.status === 'flag' && (x.details as { property?: string } | undefined)?.property === 'paragraph-spacing'
   )
   assert.equal(paragraphFlag, undefined)
 })
 
-test('1.4.12: dominant segment chosen by largest fontSize', () => {
-  const small = segment({ fontSize: 12, lineHeightPx: 18, start: 0, end: 5 })   // 18/12 = 1.5 → pass
-  const big = segment({ fontSize: 32, lineHeightPx: 32, start: 5, end: 12 })    // 32/32 = 1.0 → fail
-  const f = runTypographyCheck(dto({ texts: [text({ segments: [small, big] })] }))
-  const r = f.find(x => x.criterion === '1.4.12')
+test('typography: dominant segment chosen by largest fontSize', () => {
+  // small segment passes; big segment fails — if dominant = big, expect flag.
+  const small = segment({ fontSize: 12, lineHeightPx: 14, start: 0, end: 5 })   // 116% → pass
+  const big = segment({ fontSize: 32, lineHeightPx: 20, start: 5, end: 12 })    // 62.5% → fail
+  const f = runTypographyCheck(
+    dto({
+      texts: [
+        text({
+          isSingleVisualLine: false,
+          isSingleLine: false,
+          segments: [small, big],
+        }),
+      ],
+    })
+  )
+  const r = f.find(x => x.criterion === 'typography')
   assert.equal(r?.status, 'flag') // dominant = big segment which fails
 })
 

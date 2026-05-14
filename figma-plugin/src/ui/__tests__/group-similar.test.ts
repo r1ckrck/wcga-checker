@@ -44,11 +44,11 @@ test('1.4.11 — same numeric tuple collapses across nodes', () => {
   assert.equal(groups[0].nodes.length, 2)
 })
 
-test('1.4.12 — same property+actual+required collapses', () => {
+test('typography — same property+actual+required collapses', () => {
   const findings = [
-    flag('1.4.12', 'a', 'Body', { property: 'line-height', actual: '120%', required: '≥150%' }),
-    flag('1.4.12', 'b', 'Caption', { property: 'line-height', actual: '120%', required: '≥150%' }),
-    flag('1.4.12', 'c', 'Other', { property: 'letter-spacing', actual: '0%', required: '≥12%' }),
+    flag('typography', 'a', 'Body', { property: 'line-height', actual: '60%', required: '≥75%' }),
+    flag('typography', 'b', 'Caption', { property: 'line-height', actual: '60%', required: '≥75%' }),
+    flag('typography', 'c', 'Other', { property: 'letter-spacing', actual: '-10%', required: '≥-6%' }),
   ]
   const groups = groupSimilar(findings)
   assert.equal(groups.length, 2)

@@ -1,0 +1,2969 @@
+WEBVTT
+
+1
+00:00:00.480 --> 00:00:07.200
+and ask ourselves which principle P O U R does it relate to all right
+
+2
+00:00:11.519 --> 00:00:16.879
+okay so we'll start with our first success criteria.
+
+3
+00:00:16.879 --> 00:00:17.519
+This is
+
+4
+00:00:18.480 --> 00:00:27.839
+the most commonly occurring success criteria that we'll have to use, but it's also the most misunderstood success criteria.
+
+5
+00:00:27.839 --> 00:00:31.279
+So I'm gonna call them SC short.
+
+6
+00:00:31.280 --> 00:00:33.599
+Um moving forward.
+
+7
+00:00:35.359 --> 00:00:37.119
+So this SC, they were
+
+8
+00:00:38.000 --> 00:00:55.120
+associated number, WCHE 2.2 SC 1.1.1 it's a level A success criteria and then there's a GMGW 3.0 guideline which is again a 1.1.1 right so the numbers are the same for both essays.
+
+9
+00:00:55.120 --> 00:00:58.800
+The title is non-text content.
+
+10
+00:00:58.800 --> 00:00:59.920
+Right?
+
+11
+00:00:59.920 --> 00:01:02.240
+And what does the text say?
+
+12
+00:01:02.240 --> 00:01:10.799
+It says all non-text content should have a text alternative that serves the equivalent purpose.
+
+13
+00:01:10.799 --> 00:01:12.480
+Right?
+
+14
+00:01:12.799 --> 00:01:19.120
+What does it really mean is that if a user can't see the image, then the text alternative
+
+15
+00:01:20.320 --> 00:01:24.879
+should carry the same meaning.
+
+16
+00:01:26.079 --> 00:01:35.280
+Underlying definition is that we should not be describing the image in detail, but as designers, we should convey its purpose.
+
+17
+00:01:35.280 --> 00:01:37.359
+So there are three examples on the right.
+
+18
+00:01:37.359 --> 00:01:40.799
+We'll take a look at one each one at a time.
+
+19
+00:01:40.799 --> 00:01:53.840
+If we have a logo, the logo's all text should be not that it is the logo, instead, it should say bank personal finance.
+
+20
+00:01:53.840 --> 00:01:56.719
+Let's assume that is the name of the brand.
+
+21
+00:01:56.719 --> 00:02:00.320
+So in our case, it would be bhajaj can serve, right?
+
+22
+00:02:00.400 --> 00:02:07.759
+The alt type should be conveying the purpose, not describing what it is.
+
+23
+00:02:07.760 --> 00:02:12.560
+If there is a decoration, some background design, some separator.
+
+24
+00:02:12.560 --> 00:02:14.480
+We do not have an alt text for it.
+
+25
+00:02:14.479 --> 00:02:19.280
+We skip it because there is no meaning to convey over here.
+
+26
+00:02:19.280 --> 00:02:27.920
+If there is an infographic, then what we should do is the alt text should describe it in detail.
+
+27
+00:02:27.920 --> 00:02:37.600
+In our example here, Q3 revenue, Mumbai 40%, Delhi 30%, Bangalore 20%, other 10%, something like that.
+
+28
+00:02:37.599 --> 00:02:44.960
+So the information that is in the infographic is carried into the cortext, right?
+
+29
+00:02:45.599 --> 00:02:56.799
+There are certain cases where the description of the image can be helpful, but always remember it is helpful only when the purpose of the image is
+
+30
+00:02:57.759 --> 00:02:59.439
+permitted.
+
+31
+00:03:02.319 --> 00:03:08.719
+So let's look at the same thing with a fail versus pass for the singular example.
+
+32
+00:03:08.719 --> 00:03:16.319
+Let's assume similar to the previous infographic, we have a loan eligibility infographic on a website.
+
+33
+00:03:16.319 --> 00:03:19.120
+Right?
+
+34
+00:03:19.120 --> 00:03:25.840
+If our auditex was loan infographic, then we'd have clearly failed that success criteria.
+
+35
+00:03:27.200 --> 00:03:30.000
+Because the purpose is no.
+
+36
+00:03:30.000 --> 00:03:32.080
+What does the eligibility mean?
+
+37
+00:03:32.080 --> 00:03:35.359
+They that question is not answered.
+
+38
+00:03:35.360 --> 00:03:40.080
+The engineer has followed it, ensure that the alt text is there.
+
+39
+00:03:40.080 --> 00:03:44.560
+But the text alternative is not properly spent by us designers.
+
+40
+00:03:44.560 --> 00:03:48.479
+So then its purpose is lost.
+
+41
+00:03:48.480 --> 00:04:00.159
+Instead, if our text alternative is loan eligibility, income above three lakh per year, age twenty one to sixty, credit score seven hundred plus.
+
+42
+00:04:00.159 --> 00:04:02.079
+Then we make sure that
+
+43
+00:04:03.039 --> 00:04:17.600
+the alternative text is present, the purpose is conveyed, or we could have a subtext for the infographic that is a vision visible adjacent text and have a text alternative associated with both.
+
+44
+00:04:17.600 --> 00:04:31.600
+So we can do it in either one of these options, but as designers we need to ensure that the text alternative is mentioned and defined in the handoff period.
+
+45
+00:04:31.600 --> 00:04:38.000
+Right.
+
+46
+00:04:38.000 --> 00:04:40.560
+Okay.
+
+47
+00:04:40.560 --> 00:04:41.839
+So that was
+
+48
+00:04:43.759 --> 00:04:48.720
+one success criteria and we should ask the sex like was it
+
+49
+00:04:49.920 --> 00:04:55.360
+um going back slide do you think it was T O U R
+
+50
+00:04:57.759 --> 00:04:58.240
+so So
+
+51
+00:04:59.040 --> 00:05:02.160
+that's a question we need to ask ourselves.
+
+52
+00:05:02.160 --> 00:05:04.480
+And I'll leave that answer to you.
+
+53
+00:05:04.480 --> 00:05:06.959
+We can clarify it later, right?
+
+54
+00:05:10.240 --> 00:05:10.879
+Next
+
+55
+00:05:11.840 --> 00:05:14.000
+1.3.1.
+
+56
+00:05:14.000 --> 00:05:18.639
+This is associated with WCAG SC 1.3.1.
+
+57
+00:05:18.639 --> 00:05:20.720
+Again, a level A criteria.
+
+58
+00:05:20.720 --> 00:05:23.520
+Then you have the GIDW 3.20.
+
+59
+00:05:23.759 --> 00:05:28.880
+same guideline number one point three point one info and relationships right
+
+60
+00:05:31.360 --> 00:05:32.240
+so here
+
+61
+00:05:34.000 --> 00:05:43.120
+what the text says is information structure and relationships can be programmatically determined or available in text.
+
+62
+00:05:43.120 --> 00:05:47.759
+So let's read the heading, the title again: Info and Relationships.
+
+63
+00:05:47.759 --> 00:05:52.000
+The text says the relationship should be programmatically determined.
+
+64
+00:05:52.000 --> 00:05:52.719
+Right?
+
+65
+00:05:53.040 --> 00:05:54.800
+What does that mean?
+
+66
+00:05:54.800 --> 00:06:00.000
+I think would be better explained using an example.
+
+67
+00:06:01.040 --> 00:06:03.360
+But let's first read through it nevertheless.
+
+68
+00:06:03.519 --> 00:06:10.000
+Bigger bolder font needs a heading tag, a visual group needs a field set.
+
+69
+00:06:10.000 --> 00:06:18.480
+And a simple test for us would be: if we turned off all CSS, is the structure still clear?
+
+70
+00:06:18.480 --> 00:06:22.720
+I hope everyone's comfortable with HTML and CSS.
+
+71
+00:06:24.000 --> 00:06:29.439
+So using those tags as the point of discussion.
+
+72
+00:06:29.439 --> 00:06:31.040
+We'll first take the
+
+73
+00:06:31.840 --> 00:06:37.519
+ALD example and then we'll take a look at the passing semantic example.
+
+74
+00:06:37.519 --> 00:06:44.399
+Here, what happens is personal details is a div tag with the class big bolt.
+
+75
+00:06:44.400 --> 00:06:45.600
+The tan
+
+76
+00:06:46.480 --> 00:06:49.680
+entry box is again a div tag.
+
+77
+00:06:49.680 --> 00:06:51.280
+There is no label.
+
+78
+00:06:51.280 --> 00:06:55.840
+And then address box is again another gift tank.
+
+79
+00:06:55.840 --> 00:06:58.240
+There is no field set.
+
+80
+00:06:58.240 --> 00:07:00.879
+Whereas, if there was
+
+81
+00:07:01.840 --> 00:07:11.839
+a heading tag that was used for personal details, a label for the panel um input box and then a fixed defined for the address
+
+82
+00:07:17.759 --> 00:07:26.480
+then what we need to do is uh sorry, then it's more clearly understood the visual hierarchy, right?
+
+83
+00:07:26.800 --> 00:07:27.120
+So
+
+84
+00:07:28.240 --> 00:07:28.560
+this
+
+85
+00:07:29.759 --> 00:07:30.719
+I'll show you
+
+86
+00:07:32.240 --> 00:07:33.040
+yeah.
+
+87
+00:07:33.040 --> 00:07:36.159
+So the regular hierarchy is then not clearly understood.
+
+88
+00:07:36.800 --> 00:07:37.120
+So
+
+89
+00:07:38.720 --> 00:07:41.040
+basic uh excuse me.
+
+90
+00:07:42.639 --> 00:07:45.759
+Uh just hold on for a moment.
+
+91
+00:07:45.759 --> 00:07:46.319
+Yeah.
+
+92
+00:07:46.319 --> 00:07:49.600
+Basically for the people who don't understand CSS HTML.
+
+93
+00:07:49.600 --> 00:07:59.439
+When you are designing the Where this would actually help is when someone's using an assistive technology and they need to walk through the different parts of the web page.
+
+94
+00:07:59.439 --> 00:08:00.079
+The web
+
+95
+00:08:03.439 --> 00:08:06.079
+yeah to use the letter.
+
+96
+00:08:06.079 --> 00:08:11.360
+So basically okay um I understand that there is a question.
+
+97
+00:08:12.240 --> 00:08:27.200
+So basically uh if you don't understand development and HTML, so what Guru is trying to explain is when you are uh developing a form like this, can you operate it with your eyes closed, can you understand what the form is saying?
+
+98
+00:08:27.199 --> 00:08:30.080
+You eyes you close your eyes, you go navigate.
+
+99
+00:08:31.120 --> 00:08:34.959
+Can the reader clearly specify this that this field is for PAN?
+
+100
+00:08:34.960 --> 00:08:38.240
+So that's what he's explaining in a very technical manner.
+
+101
+00:08:38.240 --> 00:08:42.080
+But overall basically that is what this is.
+
+102
+00:08:42.720 --> 00:08:46.960
+CSS is the colors and the shapes, eight minutes the this text line.
+
+103
+00:08:46.960 --> 00:08:49.600
+So the text without the CSS without the colours.
+
+104
+00:08:49.600 --> 00:08:49.840
+Can you
+
+105
+00:08:55.440 --> 00:08:56.159
+Okay.
+
+106
+00:08:56.159 --> 00:08:58.080
+I think I'll continue.
+
+107
+00:09:02.960 --> 00:09:06.320
+Okay, going back, just a quick recap.
+
+108
+00:09:06.320 --> 00:09:22.399
+We're looking at influence relationships and how we need to use the correct tags for the different visual elements so that we not only maintain visual hierarchy, but we also maintain semantic hierarchy of how the different elements are related to each other.
+
+109
+00:09:22.399 --> 00:09:24.480
+Personal details is a heading.
+
+110
+00:09:24.480 --> 00:09:33.920
+There is a label associated for the input box, and there are field sets associated for the different um other input boxes that's it right
+
+111
+00:09:39.039 --> 00:09:42.399
+so again let's do a fail and a pass case.
+
+112
+00:09:42.399 --> 00:09:45.840
+We'll start with a KYC form.
+
+113
+00:09:45.840 --> 00:09:52.000
+And we'll start with the fail case.
+
+114
+00:09:52.000 --> 00:09:58.720
+Similarly, if we just have a larger and bolder personal details and a place separator for the field set
+
+115
+00:09:59.919 --> 00:10:09.120
+and an asterisk, visually yes it looks correct, but semantically it's wrong and would fail this success criteria
+
+116
+00:10:10.080 --> 00:10:10.400
+because
+
+117
+00:10:11.840 --> 00:10:12.160
+when
+
+118
+00:10:13.519 --> 00:10:13.840
+um
+
+119
+00:10:14.800 --> 00:10:22.000
+so let's take a look at the past criteria and we'll look at why this is important when we move to the assistive technologies aspect.
+
+120
+00:10:22.000 --> 00:10:34.640
+Um, but a quick note is assistive technologies use these different semantic hierarchies to help a differently able user
+
+121
+00:10:35.600 --> 00:10:40.000
+in understanding and going through a website, right?
+
+122
+00:10:40.320 --> 00:10:51.360
+So the password be essentially as we saw before, the correct heading tag is used, a field set is used, and then ARIA required true is also used.
+
+123
+00:10:51.360 --> 00:11:07.120
+These are fields that help in defining the semantic structure within the different elements of the ramp application.
+
+124
+00:11:07.120 --> 00:11:09.440
+Okay.
+
+125
+00:11:09.440 --> 00:11:18.960
+So the previous one, if you can think about it, was it a POUR?
+
+126
+00:11:18.960 --> 00:11:21.600
+I'm sure you have your guesses.
+
+127
+00:11:21.600 --> 00:11:28.240
+But that uh so the answer to that is it's an observable success criteria, right?
+
+128
+00:11:28.240 --> 00:11:38.400
+Because you can drive it with an SS to technology or keyboard, um you move through the different elements based on semantic structure.
+
+129
+00:11:38.399 --> 00:11:42.639
+Just to answer for the first one with respect to contrast ratio that is an E
+
+130
+00:11:43.440 --> 00:11:45.680
+success criteria.
+
+131
+00:11:45.680 --> 00:11:47.760
+Okay.
+
+132
+00:11:47.759 --> 00:11:53.200
+Moving on to a similar contrast based SC.
+
+133
+00:11:56.639 --> 00:12:04.400
+So the contrast ratio here 4.5 to 1 for text 3 is to 1 for larger text.
+
+134
+00:12:04.399 --> 00:12:04.879
+Right?
+
+135
+00:12:04.879 --> 00:12:07.200
+This is something that we saw earlier.
+
+136
+00:12:08.720 --> 00:12:13.600
+And this needs to be checked with the tool, it should not be checked with your eyes.
+
+137
+00:12:13.600 --> 00:12:18.879
+So there is a clear definition of when it passes and when it fails.
+
+138
+00:12:18.879 --> 00:12:27.759
+The only exceptions are pure decoration, any logos, and any disabled non-functional, non-observable
+
+139
+00:12:31.360 --> 00:12:34.000
+Elements that are not rendered, right?
+
+140
+00:12:34.000 --> 00:12:36.800
+So those things we do not look into.
+
+141
+00:12:37.600 --> 00:12:43.040
+There are definitions for logos as well, but we'll come to that later.
+
+142
+00:12:43.039 --> 00:12:48.399
+This is associated with 1.4.3 and this is a level AA
+
+143
+00:12:49.200 --> 00:12:51.759
+SE, not a level A S E.
+
+144
+00:12:51.759 --> 00:12:57.600
+And similarly, similarly in GIGW it's a we know 1.4.3 right
+
+145
+00:12:59.360 --> 00:13:01.680
+so here we do have a few
+
+146
+00:13:06.560 --> 00:13:10.240
+so here we do have a few uh examples over here.
+
+147
+00:13:11.039 --> 00:13:12.160
+Right?
+
+148
+00:13:12.159 --> 00:13:12.480
+Um
+
+149
+00:13:13.680 --> 00:13:22.400
+so the foreground and the background with the normal large and UI, it I don't think it looks perfectly uh visible over here
+
+150
+00:13:23.360 --> 00:13:32.240
+but on a website it's quite quite clearly detectable when we use the um automated testing tools.
+
+151
+00:13:34.000 --> 00:13:45.920
+But just as an example you can quite clearly see how the right side account balance is a lot more clear compared to the left side account balance.
+
+152
+00:13:46.159 --> 00:13:49.920
+Okay.
+
+153
+00:13:49.920 --> 00:13:50.240
+So
+
+154
+00:13:52.480 --> 00:14:16.559
+this example if we use a light grey row on white, the contrast ratio is about 2.8 to 1, and it may be visible for us, but it's the definitions are and the success criteria guidelines are defined after a lot of testing and thorough um looking at all the different groups.
+
+155
+00:14:16.560 --> 00:14:18.000
+So we shouldn't be doing that.
+
+156
+00:14:18.000 --> 00:14:21.759
+We should ensure that it's properly tested and used.
+
+157
+00:14:22.639 --> 00:14:30.960
+And just because it works on a few different devices we shouldn't consider it as okay always test it with an automated tool right
+
+158
+00:14:31.840 --> 00:14:42.640
+and this is something that we need to have in our design kits so that the correct colors and contrast ratios are maintained.
+
+159
+00:14:42.639 --> 00:14:44.000
+Okay.
+
+160
+00:14:44.000 --> 00:14:48.880
+Next, let's move on to 1.4.11.
+
+161
+00:14:49.120 --> 00:14:56.400
+Contrast is something that we most commonly use, that's why there's a higher emphasis.
+
+162
+00:14:58.080 --> 00:15:03.440
+And we have looked at text contrast so far, but we should also ensure non-text contrast.
+
+163
+00:15:03.600 --> 00:15:10.480
+So for any UI components, any icons that require contrast, we need to ensure that they also
+
+164
+00:15:11.600 --> 00:15:13.600
+maintain the necessary limits.
+
+165
+00:15:13.600 --> 00:15:16.400
+And for that it is 3 is to 1.
+
+166
+00:15:16.960 --> 00:15:19.759
+And let's read the text once again.
+
+167
+00:15:20.159 --> 00:15:27.600
+UI components and graphical objects need contrast ratio at least 3 is to 1 against adjacent colors.
+
+168
+00:15:27.600 --> 00:15:38.320
+So input borders, iPhones, focus strings, state indicators all should be measured against a three is to one SC.
+
+169
+00:15:38.320 --> 00:15:39.200
+And here
+
+170
+00:15:40.320 --> 00:15:55.279
+if we do have any shadows, any ghosts, uh, any overlays, those are things that we again need to consider um with more scrutiny to ensure that it passes the necessary SE type
+
+171
+00:15:57.440 --> 00:16:19.120
+again as um an example I've shown here how a one point four to one looks like and how a three point six or a nine point seven to 1 where clear contrast ratios show much better compared to the feeling examples.
+
+172
+00:16:19.120 --> 00:16:26.160
+Okay, all contrast related ones are T, that is perceivable related um
+
+173
+00:16:27.600 --> 00:16:29.759
+SEs.
+
+174
+00:16:29.759 --> 00:16:33.039
+And we've also looked at one O related S E.
+
+175
+00:16:34.320 --> 00:16:42.000
+Now let's move on to something um let's move on to more O-related essays, right?
+
+176
+00:16:42.480 --> 00:16:50.000
+And this is something that I learned later was that was very important.
+
+177
+00:16:50.000 --> 00:17:12.880
+This is a combination of two SEs, 2.4.3, 2.4.7, where focus is real and it has to move sensibly there are two over here um in the WCAG guidelines is two point four point three that's a level A guideline um then you have the two point four point seven which is a level AA guideline.
+
+178
+00:17:12.880 --> 00:17:17.839
+Same numbers are used for the GITW 3.0 guidelines as well.
+
+179
+00:17:17.839 --> 00:17:27.039
+Okay, so we'll look at the text of 2.4.3 first, which is focus moves through the page in an order that preserves meaning.
+
+180
+00:17:27.039 --> 00:17:33.839
+And for 2.4.7, when a component has focus, it's visually indicated.
+
+181
+00:17:33.839 --> 00:17:42.559
+If some of you have used the tab button in the keyboard when you select this is exactly that success criteria.
+
+182
+00:17:42.559 --> 00:17:48.480
+What the tab does is it shifts focus from the current element to the next element
+
+183
+00:17:49.839 --> 00:17:50.879
+2.4.3
+
+184
+00:17:51.920 --> 00:17:55.360
+defines that the order should be meaningful.
+
+185
+00:17:55.519 --> 00:18:11.040
+2.4.7 says whichever is active, whichever is focused, that should have a visual indication right so there needs to be a pop-up or like a broader, thicker guy, thicker border, something like that.
+
+186
+00:18:14.240 --> 00:18:23.519
+In a simple sign and flow normally the the expected tab order should be from customer ID.
+
+187
+00:18:23.519 --> 00:18:34.720
+The first tab uh the second tab should bring the focus down to password, the next time should bring it down to remember me and then the next time should bring it to sign in.
+
+188
+00:18:34.720 --> 00:18:35.519
+Right.
+
+189
+00:18:35.519 --> 00:18:39.360
+So that is the tab order that should be followed.
+
+190
+00:18:39.360 --> 00:18:42.480
+And this tab order should again be defined by us
+
+191
+00:18:46.000 --> 00:18:47.359
+okay um
+
+192
+00:18:49.440 --> 00:19:01.039
+in the design steps so then the engineers have the necessary information when they're constructing the web page or web application.
+
+193
+00:19:01.039 --> 00:19:13.599
+Here you would have had a clear example when we take the OTP flow of good versus bad user experience.
+
+194
+00:19:13.600 --> 00:19:17.200
+So we'll take a fail case and then the past case.
+
+195
+00:19:17.200 --> 00:19:23.279
+In a fail case it's focused jumps back to the first OTP digit after auto advance.
+
+196
+00:19:23.279 --> 00:19:32.960
+So let's imagine that after every OTP number that you type, the focus goes back to the first one, then you have to click whichever OTP.
+
+197
+00:19:32.960 --> 00:19:34.079
+That's very bad, right?
+
+198
+00:19:34.079 --> 00:19:38.639
+So the user gets confused because it's not intuitive.
+
+199
+00:19:38.640 --> 00:19:44.480
+And these are aspects that an engineer would not consider by default.
+
+200
+00:19:44.480 --> 00:19:59.359
+They would just ensure that the OTP is functioning, but as designers, it's our duty to ensure that these are aspects that are defined clearly and also communicated with the engineering team.
+
+201
+00:20:00.160 --> 00:20:09.839
+So the pass criteria, how a passing OTP flow would look like is the focus of auto-advances through all the six digits.
+
+202
+00:20:09.839 --> 00:20:15.119
+And after all six digits are entered the focus moves on to the verify
+
+203
+00:20:15.920 --> 00:20:26.159
+and here we need to do a proper spec right that after the six digit the move uh we need to move the focus to verify.
+
+204
+00:20:27.759 --> 00:20:30.240
+Okay.
+
+205
+00:20:30.240 --> 00:20:35.440
+So this again is one of those operable essays, right?
+
+206
+00:20:35.440 --> 00:20:44.159
+In the POUR portent, or is what we were focusing on.
+
+207
+00:20:44.720 --> 00:20:51.039
+Now let's shift our focus to a U criteria or a USC which is understandable.
+
+208
+00:20:51.200 --> 00:20:55.840
+Again, similarly a combination of 3.31 and 3.32.
+
+209
+00:20:57.120 --> 00:21:04.159
+These are same numbers across WCAG and G I G W.
+
+210
+00:21:04.240 --> 00:21:12.319
+The title says every input has a label, every editor has a location and a message.
+
+211
+00:21:12.319 --> 00:21:21.519
+Key point key two labels is every input should have a visible label or instruction that is a text?
+
+212
+00:21:21.519 --> 00:21:26.480
+And for error IDs, that is 3.3.21.
+
+213
+00:21:26.480 --> 00:21:32.639
+When validation fails, the error is identified in text.
+
+214
+00:21:32.640 --> 00:21:43.359
+So the meaning here is there needs to be there should not be any placeholder as a label and every error states which field and what is wrong.
+
+215
+00:21:43.360 --> 00:21:50.799
+So that needs to be clearly defined so that the user knows exactly what needs to be done.
+
+216
+00:21:50.799 --> 00:21:54.880
+This is the principle of Q, understandable in the The port button
+
+217
+00:21:56.160 --> 00:21:59.119
+that is being followed.
+
+218
+00:21:59.120 --> 00:22:12.399
+So in the fail case that we are seeing here, instead of just saying invalid input, we need to highlight that particular field which is incorrect.
+
+219
+00:22:12.400 --> 00:22:15.440
+Mention that it is required.
+
+220
+00:22:15.440 --> 00:22:26.480
+That is, and then also mention what exactly was the error, which is UPI ID format should be in name at back.
+
+221
+00:22:26.480 --> 00:22:34.319
+This makes the entire process more understandable and smoother for the user so that there is no confusion
+
+222
+00:22:35.440 --> 00:22:37.440
+that is present at all right
+
+223
+00:22:44.400 --> 00:22:52.799
+and here um we'll take another example of where it failed versus pass.
+
+224
+00:22:52.799 --> 00:22:58.240
+So in the failure there is simply a single red host at the top saying transaction failed.
+
+225
+00:22:58.240 --> 00:23:03.599
+But the user has no idea what happened, which field, nothing.
+
+226
+00:23:03.600 --> 00:23:07.760
+And users who use the screen data, they hear nothing useful.
+
+227
+00:23:09.200 --> 00:23:14.559
+So they're also in a lot of confusion.
+
+228
+00:23:14.559 --> 00:23:16.159
+In the case of a pass
+
+229
+00:23:17.039 --> 00:23:23.039
+SC, what we do is we let the user know what the exacting offending field is.
+
+230
+00:23:23.039 --> 00:23:24.960
+CdV must be three digits
+
+231
+00:23:26.160 --> 00:23:30.480
+and similarly for all the different failure cases.
+
+232
+00:23:30.480 --> 00:23:34.159
+The toast should summarize the overall failure.
+
+233
+00:23:34.160 --> 00:23:51.279
+Focus moves to the first error field, and the role alert is mentioned so that assisted technology can announce it.
+
+234
+00:23:51.279 --> 00:23:58.079
+Okay, so those were the six most common success criteria that we had followed.
+
+235
+00:23:58.079 --> 00:23:58.399
+Um
+
+236
+00:23:59.680 --> 00:24:00.000
+and
+
+237
+00:24:00.960 --> 00:24:10.639
+in our design process we have broadly speaking a wireframe, virtual design, handoff, and then design token stages.
+
+238
+00:24:10.640 --> 00:24:10.960
+And
+
+239
+00:24:11.920 --> 00:24:17.040
+each SC can also be looked at which design stage that they fall in.
+
+240
+00:24:17.360 --> 00:24:22.160
+So during the wireframe we can look at all the operable stuff.
+
+241
+00:24:22.160 --> 00:24:28.880
+During the visual design we can ensure all the perceivable colours and typographies are defined.
+
+242
+00:24:28.880 --> 00:24:41.599
+During the handoff spec, we it's a combination of both, but we draw the right lines, ensure that um everything's clear to the engineering team during that time.
+
+243
+00:24:42.400 --> 00:24:47.920
+And during compile time we do one more round of testing, right?
+
+244
+00:24:47.920 --> 00:24:48.240
+So
+
+245
+00:24:49.519 --> 00:24:49.839
+this
+
+246
+00:24:50.640 --> 00:24:52.559
+is another aspect to look at.
+
+247
+00:24:52.559 --> 00:25:02.159
+So you identify which SCs are involved in which stage of design and we handle it there.
+
+248
+00:25:02.160 --> 00:25:03.279
+Excuse me?
+
+249
+00:25:03.600 --> 00:25:08.160
+Here are few tools that I'd like to bring to your notice.
+
+250
+00:25:08.160 --> 00:25:22.400
+These are tools that I've used and um I know a lot of people who use, which ensure that a lot of these tools uh I mean a lot of these success criteria are met and caught with the tools over here.
+
+251
+00:25:22.400 --> 00:25:23.200
+Okay.
+
+252
+00:25:23.200 --> 00:25:23.519
+Um
+
+253
+00:25:26.640 --> 00:25:27.680
+slide back.
+
+254
+00:25:27.680 --> 00:25:30.079
+Alright, there's another question.
+
+255
+00:25:39.360 --> 00:25:43.039
+The three lines under design tokens, can you ask him to explain it please?
+
+256
+00:25:43.680 --> 00:25:46.559
+Can you use the mic because you move it from here?
+
+257
+00:26:01.519 --> 00:26:06.000
+Uh that's a question here.
+
+258
+00:26:06.079 --> 00:26:17.920
+And then if it's the line, uh the three lines under design tokens, uh contrast rate, ramps, focus string, primitives, minimum target size tokens.
+
+259
+00:26:17.920 --> 00:26:21.039
+Can you just explain how do they do the certain design tokens?
+
+260
+00:26:21.039 --> 00:26:26.399
+Are they tokens themselves or are they uh criteria that the tokens need to follow something back.
+
+261
+00:26:31.840 --> 00:26:44.319
+Uh the three lines are the design tokens, contrast here, ramps, processing primitives, minimum target size tokens, are these tokens themselves or are these criteria to create tokens or are they scripts that were run to test the tokens or something like that?
+
+262
+00:26:44.319 --> 00:26:46.000
+So can you explain these three lines?
+
+263
+00:26:47.039 --> 00:26:48.400
+Sure sure, I'll do that.
+
+264
+00:26:48.400 --> 00:26:50.720
+Oh that's a good question.
+
+265
+00:26:51.039 --> 00:26:54.159
+Excuse me, also non-designers, can you ask
+
+266
+00:26:55.200 --> 00:26:56.000
+one more question?
+
+267
+00:26:56.000 --> 00:26:57.359
+Can we have all the questions together?
+
+268
+00:26:57.360 --> 00:26:57.680
+Yeah.
+
+269
+00:26:58.400 --> 00:26:59.920
+Yeah, it's very related to that.
+
+270
+00:26:59.920 --> 00:27:02.879
+What is design token for non-designers?
+
+271
+00:27:04.480 --> 00:27:07.920
+Okay, um am I audible once again?
+
+272
+00:27:09.200 --> 00:27:10.799
+I think I am.
+
+273
+00:27:11.519 --> 00:27:17.120
+So the question was contra safe ramps, focusing primitives, minimum target size token.
+
+274
+00:27:17.120 --> 00:27:24.639
+Are these design tokens themselves or um are they like systems are they tools those are kind of things right
+
+275
+00:27:27.279 --> 00:27:27.599
+so
+
+276
+00:27:28.400 --> 00:27:28.720
+um
+
+277
+00:27:30.000 --> 00:27:34.240
+I think it's a combination of both 10.
+
+278
+00:27:35.519 --> 00:27:38.480
+But mostly these are design tokens themselves.
+
+279
+00:27:38.480 --> 00:27:40.480
+They're not a system per se.
+
+280
+00:27:40.480 --> 00:27:46.720
+These are things that are tested by the systems and the tools that we took at in the next slide.
+
+281
+00:27:46.720 --> 00:27:54.000
+Um the other question that I received is are there any design tools for non-designers?
+
+282
+00:27:54.000 --> 00:27:55.200
+Okay.
+
+283
+00:27:55.200 --> 00:27:55.440
+So
+
+284
+00:27:57.039 --> 00:27:59.039
+what are design tokens for non-designers?
+
+285
+00:27:59.039 --> 00:28:04.240
+We can do uh we do have a lot of design rules for non-designs.
+
+286
+00:28:04.240 --> 00:28:04.559
+Um
+
+287
+00:28:06.640 --> 00:28:15.759
+and you don't like wireframes and can be quite simple if you're doing simple block based designs there are tools for that as well
+
+288
+00:28:17.200 --> 00:28:19.920
+or design tokens for non-designs
+
+289
+00:28:23.200 --> 00:28:24.399
+What are design tokens?
+
+290
+00:28:24.559 --> 00:28:29.279
+Yeah BCD because I'm not able to understand that as well.
+
+291
+00:28:29.279 --> 00:28:29.680
+Okay.
+
+292
+00:28:29.680 --> 00:28:30.799
+What are they attributes?
+
+293
+00:28:31.120 --> 00:28:33.839
+So uh design tokens for no designers
+
+294
+00:28:35.440 --> 00:28:39.280
+well I think there's a way to define that as well.
+
+295
+00:28:39.279 --> 00:28:43.359
+Um that should still be okay.
+
+296
+00:28:43.360 --> 00:28:44.240
+But um
+
+297
+00:28:45.200 --> 00:28:45.839
+nothing
+
+298
+00:28:49.200 --> 00:28:51.839
+That's something I'll get back to you on actually.
+
+299
+00:28:51.840 --> 00:28:53.440
+Can I just explain it?
+
+300
+00:28:53.759 --> 00:28:55.200
+Can I just explain it?
+
+301
+00:28:55.200 --> 00:28:58.559
+Can you just explain what Aria labels and tokens are?
+
+302
+00:28:58.559 --> 00:29:00.639
+Okay, another question is what are Aria labels
+
+303
+00:29:03.200 --> 00:29:06.079
+These are labels and attributes that are
+
+304
+00:29:07.519 --> 00:29:11.519
+used for assistive technologies like a voice reader.
+
+305
+00:29:11.759 --> 00:29:13.280
+Sorry, a screen reader.
+
+306
+00:29:13.279 --> 00:29:20.879
+So a screen reader reads these area labels and then speaks them out to the user.
+
+307
+00:29:20.880 --> 00:29:26.480
+Just like how you have all text, you also have area labels for different components.
+
+308
+00:29:26.559 --> 00:29:34.639
+All text is for images and labels as usually for buttons and um operable objects.
+
+309
+00:29:34.640 --> 00:29:41.279
+It basically announces whether it is a drop down, whether it's a deck, it is an input field.
+
+310
+00:29:41.680 --> 00:29:42.640
+Optional.
+
+311
+00:29:42.640 --> 00:29:43.519
+So are you?
+
+312
+00:29:43.519 --> 00:29:46.480
+I take it there are no further questions.
+
+313
+00:29:47.840 --> 00:29:48.880
+Anyone else?
+
+314
+00:29:48.880 --> 00:29:50.160
+Any question?
+
+315
+00:29:50.240 --> 00:29:50.639
+No?
+
+316
+00:29:54.240 --> 00:29:55.599
+All right, great.
+
+317
+00:29:58.880 --> 00:29:59.680
+Okay.
+
+318
+00:29:59.680 --> 00:30:00.000
+So
+
+319
+00:30:02.000 --> 00:30:06.160
+using the previous slide as a segue.
+
+320
+00:30:06.160 --> 00:30:11.200
+These are tools and plugins that we can use as designers
+
+321
+00:30:12.480 --> 00:30:26.399
+to catch a lot of these errors in maintaining the success criteria so that um we can have catch them before handoff itself, not leave it until development and when kids to testing.
+
+322
+00:30:26.400 --> 00:30:28.080
+That's gonna cost us a lot.
+
+323
+00:30:28.079 --> 00:30:30.879
+It's gonna be a lot of waste and time as well.
+
+324
+00:30:31.519 --> 00:30:40.559
+So we need to do our due diligence in ensuring that we try and maintain these using the systems that are already available.
+
+325
+00:30:43.519 --> 00:30:47.119
+So when you do get the time, just take a look at these
+
+326
+00:30:49.840 --> 00:30:58.240
+and you'll have um a better tool set to work with to ensure accessible design.
+
+327
+00:31:03.360 --> 00:31:05.200
+Okay.
+
+328
+00:31:05.200 --> 00:31:15.279
+These are the three frameworks that I mentioned I'll dive into a little bit more in detail, which is the WCAG, the IS and GIGW.
+
+329
+00:31:16.720 --> 00:31:20.080
+WCAG is in the international guidelines.
+
+330
+00:31:20.079 --> 00:31:22.400
+IS and GIGW are maintained
+
+331
+00:31:23.279 --> 00:31:25.759
+by the government of India.
+
+332
+00:31:28.319 --> 00:31:36.480
+The takeaway for us is that if we shift to a WCAG level, we mostly uh that is the AA level.
+
+333
+00:31:36.480 --> 00:31:41.360
+We mostly meet with most guidelines, and we meet with the bulk of both.
+
+334
+00:31:41.360 --> 00:31:41.680
+There
+
+335
+00:31:42.559 --> 00:31:44.799
+about all of it is overlaps.
+
+336
+00:31:44.799 --> 00:31:58.559
+There could be a few uh flavors and definition of the same success criteria and that's what you need to keep in mind.
+
+337
+00:31:58.559 --> 00:32:00.559
+Okay.
+
+338
+00:32:00.559 --> 00:32:05.839
+So that was all related to the success criteria of what
+
+339
+00:32:06.720 --> 00:32:12.399
+accessible design should look like under these guidelines.
+
+340
+00:32:12.480 --> 00:32:17.359
+The next part that we're going to look into is assistive technologies and how
+
+341
+00:32:18.319 --> 00:32:21.599
+they are important for us as designers.
+
+342
+00:32:26.240 --> 00:32:34.960
+The fundamental rule that I keep in mind, two rules, is one, what we see is not every user's experience.
+
+343
+00:32:34.960 --> 00:32:36.640
+And the second thing is
+
+344
+00:32:37.519 --> 00:32:39.599
+always keep things simple.
+
+345
+00:32:39.600 --> 00:32:46.240
+But here we're going to be focusing on the first one.
+
+346
+00:32:46.240 --> 00:32:51.359
+There are many different types of assistive technology
+
+347
+00:32:53.759 --> 00:32:57.039
+the visual aspect is only one surface
+
+348
+00:32:58.960 --> 00:33:01.680
+in which a user interacts.
+
+349
+00:33:01.680 --> 00:33:13.759
+There can be screen readers, amplifiers, voice control, keyboard and switches all related to the different integration service interaction surfaces for users right
+
+350
+00:33:21.279 --> 00:33:27.680
+And access to technology here is not one to one with disability.
+
+351
+00:33:27.680 --> 00:33:34.480
+So there can be a combination that is used and not necessarily just one, right?
+
+352
+00:33:34.799 --> 00:33:52.319
+So a blind user might use a screen reader and a refreshability brain display, a low vision user might use a magnifier, high contrast towards theme, all larger text, all accessibility tools that are now baked into more software.
+
+353
+00:33:52.319 --> 00:34:01.920
+A motor impaired user, he or she might use a voice control, switch, head tracker, or keyboard only.
+
+354
+00:34:01.920 --> 00:34:07.599
+And a cognitive impaired user often uses like a no assistive technology, right?
+
+355
+00:34:07.920 --> 00:34:12.960
+So there needs to be high levels of clarity from your design.
+
+356
+00:34:15.199 --> 00:34:22.720
+So that's where the interlap, uh the overlap happens and the intersection is important.
+
+357
+00:34:23.760 --> 00:34:25.920
+So let's take a look at one at a time.
+
+358
+00:34:25.920 --> 00:34:34.160
+We'll start with screen readers and then we'll move on to some of the other tools that are more commonly used.
+
+359
+00:34:34.320 --> 00:34:35.440
+But before that, I'd like to
+
+360
+00:34:37.039 --> 00:34:39.039
+introduce you to someone.
+
+361
+00:34:39.039 --> 00:34:46.640
+This is Namritaman, and she will be taking us through the demos.
+
+362
+00:34:46.639 --> 00:34:52.720
+So um she's used assistant tech for both work, person life and
+
+363
+00:34:54.000 --> 00:34:56.960
+she is part of the team here in Samartya.
+
+364
+00:35:00.800 --> 00:35:03.920
+Hello everyone, I hope you're having a good day.
+
+365
+00:35:03.920 --> 00:35:13.120
+My name is Namrutha Meta, and I'm a master's in social work and working in the social development sector for the past 18 years.
+
+366
+00:35:13.679 --> 00:35:20.960
+Well I have visual impairment and I use technology and
+
+367
+00:35:22.159 --> 00:35:47.120
+rather specific technology a lot for my work, for my personal use, and I'm going to talk to you about how I use this technology, how the accessibility features work for me, what are the challenges I face and how can it be made better?
+
+368
+00:35:47.119 --> 00:35:49.440
+Okay.
+
+369
+00:35:50.639 --> 00:35:53.440
+So how does the screen reader work?
+
+370
+00:35:53.440 --> 00:35:56.560
+This is where if you remember the SC
+
+371
+00:35:58.880 --> 00:36:05.680
+with respect to the DOM with the semantic structure, that's what a screen reader uses.
+
+372
+00:36:05.920 --> 00:36:14.960
+So it uses a combination of the DOM, which is your H through label and field sets and the different hierarchies that are in built.
+
+373
+00:36:14.960 --> 00:36:18.400
+Additionally it uses the area labels.
+
+374
+00:36:18.960 --> 00:36:19.199
+That
+
+375
+00:36:20.079 --> 00:36:24.800
+becomes a spine of the accessibility tree, and any um
+
+376
+00:36:25.840 --> 00:36:36.640
+80 tool like a screen reader reads from this and converts it into understandable units for someone like Namrita.
+
+377
+00:36:36.639 --> 00:36:38.320
+Right?
+
+378
+00:36:38.559 --> 00:36:45.360
+So this is where it's important where we can see how all the SEs map into
+
+379
+00:36:46.320 --> 00:36:46.640
+um
+
+380
+00:36:49.039 --> 00:36:52.960
+map into what the SS2 technology uses to make
+
+381
+00:36:53.920 --> 00:37:04.799
+um to bring these web apps to life for them.
+
+382
+00:37:04.800 --> 00:37:07.440
+So let's take a look at this.
+
+383
+00:37:07.440 --> 00:37:07.760
+Um
+
+384
+00:37:09.360 --> 00:37:12.640
+the tries the Bajaj films a map and she gives us
+
+385
+00:37:13.519 --> 00:37:14.320
+her comments.
+
+386
+00:37:14.320 --> 00:37:18.160
+I think this will be very useful in understanding.
+
+387
+00:37:18.159 --> 00:37:18.480
+So
+
+388
+00:37:19.280 --> 00:37:28.319
+now I will show you how I navigate on the Bajat FinSurf uh website.
+
+389
+00:37:28.320 --> 00:37:31.200
+So I will just briefly show it to you.
+
+390
+00:37:31.200 --> 00:37:31.520
+So
+
+391
+00:37:33.840 --> 00:37:33.920
+I
+
+392
+00:37:35.119 --> 00:37:35.679
+need the help of
+
+393
+00:37:40.159 --> 00:37:41.840
+Then I go to sign it.
+
+394
+00:37:46.400 --> 00:37:48.719
+Here it shows me the login page.
+
+395
+00:37:49.200 --> 00:37:55.920
+Now I have to reach to a place where it tells me to enter my details.
+
+396
+00:37:55.920 --> 00:37:59.360
+Right if I'm searching placeholder, search my digital number.
+
+397
+00:37:59.519 --> 00:38:02.960
+Now I have to it's a it tells me to enter my number.
+
+398
+00:38:03.920 --> 00:38:04.239
+So I
+
+399
+00:38:05.039 --> 00:38:09.520
+will enter.
+
+400
+00:38:09.519 --> 00:38:12.079
+So suppose this is my number.
+
+401
+00:38:12.079 --> 00:38:13.920
+I think six seven things
+
+402
+00:38:15.679 --> 00:38:18.880
+It tells me to get the OTP.
+
+403
+00:38:18.880 --> 00:38:23.279
+If I click here, it will send an OTP to my number.
+
+404
+00:38:23.280 --> 00:38:28.079
+So that's how it it can be accessed by me.
+
+405
+00:38:28.079 --> 00:38:31.920
+I have not used any more features yet, but
+
+406
+00:38:33.200 --> 00:38:39.599
+uh initially when there is a sign-in option, it does not say it's a link.
+
+407
+00:38:39.599 --> 00:38:46.239
+I have clicked on it, it worked, but if it is back like a link, it will be more useful.
+
+408
+00:38:46.240 --> 00:38:51.600
+Um but by and large, this seems alright.
+
+409
+00:38:53.280 --> 00:39:05.600
+Okay, so I think that would have given you like a very interesting perspective of how a website can be also used in addition to just the visual clicks and
+
+410
+00:39:07.039 --> 00:39:09.120
+keys in the keyboard, right?
+
+411
+00:39:12.800 --> 00:39:14.640
+Okay.
+
+412
+00:39:14.639 --> 00:39:18.960
+So now let's move on to another tool, right?
+
+413
+00:39:20.960 --> 00:39:34.079
+So there's something called JOS and I'll show you a video of how it is used um in a website called ANA, which is Asia Pacific Network for Accessibility.
+
+414
+00:39:35.039 --> 00:39:40.879
+And that is something yeah we'll take a look at it.
+
+415
+00:39:41.679 --> 00:39:44.160
+Yes.
+
+416
+00:39:44.159 --> 00:39:52.640
+So, on the laptop and computer, as I said, I use a screen reading software called CHAUSE.
+
+417
+00:39:52.639 --> 00:39:52.960
+And
+
+418
+00:39:53.840 --> 00:40:01.360
+one very important thing is that people with visual impairment do not use a mouse?
+
+419
+00:40:01.360 --> 00:40:10.159
+We use keys like tab, arrows, spacebars, enters to navigate.
+
+420
+00:40:10.159 --> 00:40:18.880
+Now, this is a website of the Asia Pacific Network for Accessibility, and I show I will show you how I navigate.
+
+421
+00:40:18.880 --> 00:40:19.760
+So I
+
+422
+00:40:20.960 --> 00:40:24.559
+leave the name of the website of the same with ac accescessisibilbilityity and that because
+
+423
+00:40:28.639 --> 00:40:33.440
+it is also showing me if I have to increase the font.
+
+424
+00:40:33.440 --> 00:40:53.919
+This is a very important feature of any website for accessibility because those people who have low vision have the requirement of adjusting the fonts and if there is a large font option it really helps people with low vision to access the websites easily.
+
+425
+00:40:54.559 --> 00:40:54.880
+Like a
+
+426
+00:40:55.840 --> 00:40:56.960
+navigation picture.
+
+427
+00:40:56.960 --> 00:41:02.400
+If here you s uh see that there is a image of a logo.
+
+428
+00:41:02.400 --> 00:41:15.360
+Asia Pacific Network for example accessibility has a logo and in a in any image it is important to add alt text which describes the image.
+
+429
+00:41:15.360 --> 00:41:19.840
+Now if you can hear it.
+
+430
+00:41:19.840 --> 00:41:22.239
+It was written in the white clock over a purple background.
+
+431
+00:41:22.559 --> 00:41:29.280
+So it says it is written on in the purp in purple on a white background.
+
+432
+00:41:29.280 --> 00:41:30.880
+So I can use it.
+
+433
+00:41:30.880 --> 00:41:35.119
+Now if I keep moving, like you know, these are the links like home
+
+434
+00:41:36.400 --> 00:41:39.120
+about APNA with the team.
+
+435
+00:41:39.119 --> 00:41:47.839
+A P and A team activities activities public events events so these I can read and if I have to go on every
+
+436
+00:41:48.639 --> 00:41:50.239
+time I just have to press enter
+
+437
+00:41:51.039 --> 00:41:52.960
+the container go here.
+
+438
+00:41:54.880 --> 00:42:06.400
+Um so generally what happens in a website is that there are headings, there are buttons, there are drop boxes.
+
+439
+00:42:06.480 --> 00:42:08.319
+There are check boxes.
+
+440
+00:42:08.320 --> 00:42:17.519
+So these all need to be accessible and we use specific keys to navigate through these.
+
+441
+00:42:17.519 --> 00:42:25.519
+If there are some buttons which are unlabeled, I am not able to read what is in it, I will not be able to move further.
+
+442
+00:42:25.519 --> 00:42:29.440
+I wouldn't know where that button will take me.
+
+443
+00:42:29.440 --> 00:42:37.520
+So labeling every button, having links properly tagged is very important because
+
+444
+00:42:38.800 --> 00:42:42.880
+if we are not hearing it, we can't use it.
+
+445
+00:42:42.880 --> 00:42:58.880
+So that is how on our website or any app for that matter it is very important for it to be compatible with screen readers and all the updates should also be compatible with CD screen readers.
+
+446
+00:42:58.880 --> 00:43:13.360
+Like sometimes it happens that a website when it gets a new update it stops being accessible with a screen reader which becomes a an accessibility issue for us again.
+
+447
+00:43:13.360 --> 00:43:15.040
+Okay.
+
+448
+00:43:15.039 --> 00:43:24.400
+I think that gives us like a very detailed perspective of how these technologies are used.
+
+449
+00:43:25.200 --> 00:43:31.120
+I mean I should really thank Namrata for those videos and the team that has helped record it.
+
+450
+00:43:31.119 --> 00:43:32.720
+Right?
+
+451
+00:43:33.039 --> 00:43:42.480
+So this is what every designer, every design should have and give to the screen data, right?
+
+452
+00:43:43.200 --> 00:43:56.080
+We need a heading hierarchy, we need to ensure that it has the link text, the text alternatives, form labels, area names, and landmark regions.
+
+453
+00:43:56.079 --> 00:44:17.600
+So the semantic structure or the DOM structure that is defined by the website is what is used by screen readers and um is crucial is a spine for any accessibility sorry any screen reader or uh any assistive technology actually.
+
+454
+00:44:17.599 --> 00:44:18.880
+Right.
+
+455
+00:44:20.000 --> 00:44:25.280
+So these are important things that we need to keep in mind.
+
+456
+00:44:25.280 --> 00:44:29.840
+Okay, I understand there's a question.
+
+457
+00:44:29.840 --> 00:44:33.599
+So uh how many of you know about these concepts?
+
+458
+00:44:34.159 --> 00:44:42.799
+One, two, in detail or just so it's good that some of you know, but this is where you have to engage with the developer also going forward.
+
+459
+00:44:42.800 --> 00:44:46.559
+So when you design, you have to take the perspective from developers also.
+
+460
+00:44:46.559 --> 00:44:48.960
+So we are having a training for developers tomorrow.
+
+461
+00:44:48.960 --> 00:44:55.039
+So once that is also done, going forward, whenever you are designing, so we cannot work in silos.
+
+462
+00:44:55.039 --> 00:44:57.199
+So you have to work along with the developers also.
+
+463
+00:44:57.519 --> 00:45:04.559
+So if you don't know these concepts we can sit with development team also to understand yeah you can read about these on internet also.
+
+464
+00:45:05.039 --> 00:45:05.519
+Basically,
+
+465
+00:45:06.480 --> 00:45:09.280
+technic And I would like to add one more thing.
+
+466
+00:45:09.280 --> 00:45:18.719
+Uh so my presentation I will take you to a document which explains basically say we don't uh bifurcate uh all the criteria based on developer or designer.
+
+467
+00:45:19.119 --> 00:45:23.119
+For us it is like a holistic way of you know taking the guidelines, right?
+
+468
+00:45:23.119 --> 00:45:30.239
+So I found a document which clearly explains which is the WCAG criteria for developer if it be useful and for designer.
+
+469
+00:45:30.240 --> 00:45:35.519
+So I think that would be useful for you to use that and only those criteria you can work out, right?
+
+470
+00:45:35.519 --> 00:45:40.080
+So I'll give you some inputs also.
+
+471
+00:45:46.880 --> 00:45:50.160
+Okay, great.
+
+472
+00:45:50.159 --> 00:45:58.239
+So we do have a few more um assistive technologies and let's take a look at the next one.
+
+473
+00:45:59.119 --> 00:46:01.760
+Magnification.
+
+474
+00:46:01.760 --> 00:46:04.799
+This is when we'd like to just magnify.
+
+475
+00:46:04.800 --> 00:46:06.960
+Namata has showed us this, right?
+
+476
+00:46:06.960 --> 00:46:10.639
+Wherein the individual text aspects can be magnified.
+
+477
+00:46:10.800 --> 00:46:20.880
+There's the OS level zoom which is taken to the OS, Windows, your mobile OS, iOS, all those two have it.
+
+478
+00:46:20.880 --> 00:46:22.960
+Then you have the browser zoom.
+
+479
+00:46:22.960 --> 00:46:32.159
+You can have a simple control plus or there is the assistive technology software that allow us to do it.
+
+480
+00:46:32.159 --> 00:46:35.600
+And then there are dedicated magnifiers for zoom text
+
+481
+00:46:42.000 --> 00:46:51.040
+and there are SCs defined for this, so we need to ensure that we follow those safe reflow um
+
+482
+00:46:52.320 --> 00:46:57.120
+I mean reflow safe designs to ensure that we do not break it.
+
+483
+00:46:57.119 --> 00:47:03.680
+The design implication is every interactive element needs a visible focus string so that um
+
+484
+00:47:06.480 --> 00:47:07.120
+yeah
+
+485
+00:47:11.440 --> 00:47:34.480
+and when we're trying to ship pre-flow safe designs al,ways use relative units, no fixed positions, making sure that the focus indicators are visible at every magnification level and then the touch targets wherein we can tap the magnified pixel size is also magnified, right?
+
+486
+00:47:40.320 --> 00:47:40.960
+Okay.
+
+487
+00:47:41.200 --> 00:47:43.759
+Then we have the voice and keyboard.
+
+488
+00:47:43.760 --> 00:47:47.600
+Again, something that Namrata had showed us earlier.
+
+489
+00:47:47.599 --> 00:47:49.440
+Sorry.
+
+490
+00:47:55.200 --> 00:47:58.960
+For any voice control related stuff, we need a visible label.
+
+491
+00:47:58.960 --> 00:48:03.839
+So ARIA labels need to be mentioned and they shouldn't be hidden.
+
+492
+00:48:03.840 --> 00:48:10.319
+So when you do write a label in your spec, make sure that's an accessible name.
+
+493
+00:48:10.320 --> 00:48:16.880
+And the non-negotiables for keyboard invoice is to ensure that it's keyboard reachable.
+
+494
+00:48:18.320 --> 00:48:23.039
+You always skip to the main link as the first focusable element on every page.
+
+495
+00:48:23.039 --> 00:48:25.599
+You need to skip the nav.
+
+496
+00:48:25.599 --> 00:48:27.679
+There should be no keyboard traps.
+
+497
+00:48:27.679 --> 00:48:32.559
+What that means is it should be able to move forward and backward.
+
+498
+00:48:33.200 --> 00:48:40.159
+The label should be visible and it should be an accessible name.
+
+499
+00:48:40.159 --> 00:48:42.400
+And finally, the focus indicator.
+
+500
+00:48:42.400 --> 00:48:45.520
+Make sure that it follows the right contrasts and
+
+501
+00:48:46.800 --> 00:48:53.280
+it is visible right.
+
+502
+00:48:53.280 --> 00:49:00.960
+So when you're designing it for assisted technology, just make sure that these things are covered.
+
+503
+00:49:00.960 --> 00:49:07.520
+This will get you a majority of those essays ticked off and sure that it's accessible to
+
+504
+00:49:08.720 --> 00:49:21.920
+all these different accessive technologies, heading hierarchy, form neighbors, tabular and focus, touch targets, accessible names, and text alternatives.
+
+505
+00:49:21.920 --> 00:49:32.240
+You can see how they're similar to the essays we discussed and just by following these we get a wide range of accessibility that is covered
+
+506
+00:49:33.440 --> 00:49:33.760
+right
+
+507
+00:49:35.119 --> 00:49:38.319
+and yeah that's about it.
+
+508
+00:49:38.320 --> 00:49:40.480
+We have come to the close.
+
+509
+00:49:40.480 --> 00:49:44.640
+This is how the next rest of your day is gonna look like.
+
+510
+00:49:44.639 --> 00:49:49.200
+And we can open the floor for any questions
+
+511
+00:49:53.119 --> 00:49:54.159
+but there's no question
+
+512
+00:49:55.440 --> 00:49:55.679
+but
+
+513
+00:49:59.920 --> 00:50:00.319
+yes
+
+514
+00:50:01.360 --> 00:50:04.079
+are there any exceptions to the contrast?
+
+515
+00:50:04.079 --> 00:50:13.600
+Uh specifically to the contrast S C E whatever uh like Okay, I think we have a question here.
+
+516
+00:50:13.599 --> 00:50:14.880
+Can you just repeat it?
+
+517
+00:50:18.559 --> 00:50:21.679
+Are there any exceptions with respect to contrast, right?
+
+518
+00:50:22.240 --> 00:50:26.080
+Are there any exceptions with respect to contrast?
+
+519
+00:50:26.079 --> 00:50:26.400
+Um
+
+520
+00:50:27.679 --> 00:50:28.559
+that's a good question.
+
+521
+00:50:28.720 --> 00:50:30.400
+Can you ask because uh
+
+522
+00:50:31.440 --> 00:50:36.799
+the contrast is calculated through math, but was that is there something specifically you have in mind at the moment?
+
+523
+00:50:36.800 --> 00:50:37.679
+Yeah, say just
+
+524
+00:50:40.079 --> 00:50:40.400
+uh
+
+525
+00:50:41.200 --> 00:50:41.280
+the
+
+526
+00:50:42.400 --> 00:50:46.480
+Generally I will speak and I'll give you my opinion.
+
+527
+00:50:46.480 --> 00:50:46.800
+Um
+
+528
+00:50:52.559 --> 00:50:53.520
+mostly
+
+529
+00:50:54.559 --> 00:50:55.520
+sorry.
+
+530
+00:50:58.720 --> 00:51:06.400
+You can ask the question because I will speak about so uh the contrast is math, but we would be talking about is a visual thing.
+
+531
+00:51:06.400 --> 00:51:25.119
+Uh like you said uh automation can do a bunch of things but at the end of the way to do visu uh user testing similarly it's math that is di defining the contrast right but it cannot account for all the visual things for example, in these slides only if you'll see there's a bunch of places where you've used orange or white, which technically does not follow uh the contrast.
+
+532
+00:51:26.800 --> 00:51:28.800
+But it's after guru has finished.
+
+533
+00:51:31.280 --> 00:51:36.719
+Primary C D is white on orange and we learned it that hard way, but that doesn't fall up under the contrast.
+
+534
+00:51:36.720 --> 00:51:41.519
+But we found an independent study also where they're saying it's an exception, they did some user studies.
+
+535
+00:51:41.519 --> 00:51:43.759
+Uh so we found some exceptions.
+
+536
+00:51:43.840 --> 00:51:45.519
+I also have some other exceptions in mind.
+
+537
+00:51:45.599 --> 00:51:53.600
+So since but since if the math doesn't math uh and it takes it doesn't fall in the guidelines, it's a violation of the guidelines, what then?
+
+538
+00:51:55.039 --> 00:51:58.800
+Yes, so I think uh you can ask the first question.
+
+539
+00:51:59.119 --> 00:52:00.639
+Well, let's turn the back down to this
+
+540
+00:52:07.599 --> 00:52:08.400
+camera.
+
+541
+00:52:32.559 --> 00:52:33.440
+Okay.
+
+542
+00:52:33.440 --> 00:52:37.040
+So the question I just reacted and um
+
+543
+00:52:41.039 --> 00:52:43.200
+I hope I'm audible.
+
+544
+00:52:43.200 --> 00:52:44.000
+Okay.
+
+545
+00:52:50.559 --> 00:52:51.520
+Okay.
+
+546
+00:52:54.000 --> 00:52:54.320
+So
+
+547
+00:52:57.200 --> 00:53:03.199
+this is my perspective of uh are there any exceptions with respect to contrast.
+
+548
+00:53:03.200 --> 00:53:10.880
+Contrast, yes, the exceptions as we discussed for logos they are relatively fine.
+
+549
+00:53:10.880 --> 00:53:12.639
+And there are certain aspects.
+
+550
+00:53:12.639 --> 00:53:26.639
+But when it comes to an application in general, when it comes to accessibility of a web application where we're expected to follow the POUR guidelines, that's when these uh essays matter more.
+
+551
+00:53:26.639 --> 00:53:27.679
+If it's um
+
+552
+00:53:28.960 --> 00:53:44.719
+Design freedom that you're looking at, if you're looking at uh any um separators, any uh visual alignment, those are things that are still okay as long as they're understandable to um assistive technologies.
+
+553
+00:53:44.720 --> 00:53:48.800
+So that is my interpretation, that is what I try and follow.
+
+554
+00:53:48.800 --> 00:53:59.840
+Where these shouldn't these are not meant to restrict your design freedom, but at the same time your design freedom should not ride uh override the
+
+555
+00:54:00.880 --> 00:54:06.160
+duty that we have towards um users who require assistive technology.
+
+556
+00:54:07.440 --> 00:54:13.279
+Can you ask can you tell him that I'm seeing the WCJ guideline contrast checker doesn't work because the math is wrong?
+
+557
+00:54:13.280 --> 00:54:14.079
+And not under the.
+
+558
+00:54:14.079 --> 00:54:16.000
+I'll just answer that question of yours, yeah.
+
+559
+00:54:16.000 --> 00:54:19.679
+But I need to switch the ask him to vote on and I'll just switch the
+
+560
+00:54:20.639 --> 00:54:21.440
+and the
+
+561
+00:54:25.280 --> 00:54:34.480
+this is something very interesting and I think uh what we are trying to solve today to find a solution, how do we look at the contrast of the colours?
+
+562
+00:54:34.480 --> 00:54:38.239
+And you made a very well point the yellow on white.
+
+563
+00:54:38.559 --> 00:54:39.119
+Orange.
+
+564
+00:54:39.280 --> 00:54:39.760
+Orange.
+
+565
+00:54:39.760 --> 00:54:41.839
+I I'll tell you why yellow I said.
+
+566
+00:54:42.320 --> 00:54:43.280
+Let it come.
+
+567
+00:54:43.280 --> 00:54:45.679
+Then just ask you to go down.
+
+568
+00:54:48.480 --> 00:54:49.199
+Right.
+
+569
+00:54:49.200 --> 00:54:54.880
+So you see the Sabhaktil's website which is uh our website.
+
+570
+00:54:54.880 --> 00:55:01.359
+I was very keen when I was working with the Guru, you can put it on the speaker phone.
+
+571
+00:55:01.360 --> 00:55:06.480
+I really wanted the yellow and blue to come in my logo, Samartyam's logo.
+
+572
+00:55:06.480 --> 00:55:12.239
+A 35 year old organization, I do not want to change the color of the logo.
+
+573
+00:55:12.240 --> 00:55:15.600
+The yellow and blue is the disability rights color.
+
+574
+00:55:15.599 --> 00:55:16.319
+Right?
+
+575
+00:55:16.320 --> 00:55:28.319
+And when we started working on it, and when we started, you know, way back we started looking at how to put the compliance of WCAT together, I had to change the color yellow to orange.
+
+576
+00:55:28.320 --> 00:55:30.320
+So what you saw on
+
+577
+00:55:31.360 --> 00:55:37.440
+the presentation by Guru, a little darker color of yellow, which was like orange.
+
+578
+00:55:37.599 --> 00:55:40.960
+But if you see it here, it's very much visible.
+
+579
+00:55:40.960 --> 00:55:42.319
+It's yellow.
+
+580
+00:55:42.320 --> 00:55:43.440
+It's not orange.
+
+581
+00:55:43.440 --> 00:55:47.199
+If you are seeing on the screen, it might look orange, but this is yellow.
+
+582
+00:55:47.200 --> 00:55:56.800
+But when we went down the screen, you know, when we went down the home page, though we converted the yellow to orange.
+
+583
+00:55:56.800 --> 00:55:58.640
+See this.
+
+584
+00:55:58.639 --> 00:55:59.760
+Why?
+
+585
+00:55:59.760 --> 00:56:02.239
+I don't want to change the color of my logo.
+
+586
+00:56:02.240 --> 00:56:09.839
+Many people, many clients would don't want to because it's been weird, people recognize it's a brand, it's a brand colour.
+
+587
+00:56:09.840 --> 00:56:17.759
+But having said that we cannot compromise upon the design standards or the uh WCAT guidelines or GIG guidelines.
+
+588
+00:56:17.760 --> 00:56:23.920
+So hence what we did the logo color was slightly yellowish but other things we started putting up orange.
+
+589
+00:56:23.920 --> 00:56:37.760
+And the question to Guru is I hope he will be able to answer it when he was designing it, I was very critical and very finicky about what is the requirement in terms of not aesthetics but accessibility.
+
+590
+00:56:37.760 --> 00:56:40.719
+And he was looking at aesthetics and accessibility.
+
+591
+00:56:40.720 --> 00:56:45.600
+So Guru, if you can answer this and can we have the mic here?
+
+592
+00:56:48.720 --> 00:56:50.800
+Am I audible, Guru?
+
+593
+00:56:52.480 --> 00:57:06.560
+Okay, uh so what are the challenges that you face not only regarding the color contrast but all the overall you know look of the entire website when I was working with you and it was my first interaction with you.
+
+594
+00:57:06.559 --> 00:57:07.519
+Okay.
+
+595
+00:57:07.519 --> 00:57:12.160
+So for me um this was very interesting because
+
+596
+00:57:13.760 --> 00:57:30.800
+one of the first accessibility um websites that I built with such uh as ma'am initially said more preference to the accessibility aspects and uh over the aesthetics as well so
+
+597
+00:57:32.800 --> 00:57:45.600
+what I did too was, as Man suggested uh over here, aesthetics was not something to be compromised upon, but what I learned over that experience was that um
+
+598
+00:57:47.119 --> 00:57:51.360
+It can be made aesthetic with accessibility at the forefront.
+
+599
+00:57:51.360 --> 00:57:53.920
+There are there's no need to compromise.
+
+600
+00:57:53.920 --> 00:58:01.199
+It's just another constraint that we have to keep in place and ensure that we're meeting everyone's needs.
+
+601
+00:58:02.159 --> 00:58:06.239
+But we can definitely build beautiful websites,
+
+602
+00:58:07.440 --> 00:58:09.360
+amazing workflows.
+
+603
+00:58:09.599 --> 00:58:10.320
+Just that
+
+604
+00:58:11.360 --> 00:58:23.440
+this layer adds at least in my own experience it added a level of excitement in building uh something that is accessible to more than just one demographic.
+
+605
+00:58:23.440 --> 00:58:23.840
+So So
+
+606
+00:58:26.960 --> 00:58:29.520
+that was my experience with it.
+
+607
+00:58:29.519 --> 00:58:33.520
+Definitely something new, but wonderful.
+
+608
+00:58:34.240 --> 00:58:42.240
+So do you have any questions for him for Guru, because this is I think we're just towards the end of his presentation.
+
+609
+00:58:42.320 --> 00:58:43.119
+Anyone?
+
+610
+00:58:43.119 --> 00:58:44.960
+Yes.
+
+611
+00:58:44.960 --> 00:58:45.360
+No?
+
+612
+00:58:45.519 --> 00:58:48.559
+Is it clear from the designer point of view?
+
+613
+00:58:48.559 --> 00:59:01.039
+So one thing we need to remember that if the designers are not putting bond accessibility quotes unquote into your design components, for a developer, it will be very difficult to fix that.
+
+614
+00:59:01.039 --> 00:59:12.719
+So remember, you are the, you know what, Vishwakarmas, you put it into accessibility of your design, and then the developers will be governed to build you.
+
+615
+00:59:12.720 --> 00:59:13.440
+Alright?
+
+616
+00:59:13.760 --> 00:59:14.559
+Kiel?
+
+617
+00:59:14.720 --> 00:59:19.279
+So can we say thank you to uh Guru and with a
+
+618
+00:59:21.440 --> 00:59:27.360
+round of applause for his presentation?
+
+619
+00:59:31.119 --> 00:59:32.239
+Thank you so much for
+
+620
+00:59:34.400 --> 00:59:41.039
+so there will be uh you know uh sort of couple of things that we wanted to really put on.
+
+621
+00:59:41.519 --> 00:59:47.279
+Uh I'll I just want to show this one.
+
+622
+00:59:47.280 --> 00:59:56.639
+Um, you know, when we were putting our pictures together and since I said I'm from the I've been working with uh honorable prime store.
+
+623
+00:59:56.639 --> 01:00:08.799
+There were also these things like the colour contrast, the size of the font, the uh you know how to put uh something which is aesthetically good but doesn't actually take away the essence of accessibility.
+
+624
+01:00:08.800 --> 01:00:28.719
+So if you see this particular um you know page the home page, what we did was you know I asked Pudu to put a little bit of a ribbon at the back, you know, to just to give you a little bit of a depth and layer and a sense to the whole thing, because when he presented the entire thing to a me, it was like all white.
+
+625
+01:00:28.720 --> 01:00:32.960
+And when my colleague with the low vision came, he said yellow is not working.
+
+626
+01:00:32.960 --> 01:00:37.360
+Then Namrita came and she said, Oh my god, my screen reader is not working.
+
+627
+01:00:37.360 --> 01:00:39.599
+So we were making Guru mad about it.
+
+628
+01:00:39.599 --> 01:00:46.159
+He was both the designer and the you know coding uh tech expert and he was going mad with it.
+
+629
+01:00:46.159 --> 01:00:52.800
+And if I tell you the whole scenario, this website was made in four days.
+
+630
+01:00:52.800 --> 01:00:54.239
+Just four days.
+
+631
+01:00:54.240 --> 01:01:05.119
+And one person and seven of us with different disabilities bogging his head every day time he used to put something in please check, and all seven of us will jump onto his life saying,
+
+632
+01:01:08.480 --> 01:01:10.319
+In four days he did it.
+
+633
+01:01:10.320 --> 01:01:14.079
+And we have one of the most accessible websites in the country.
+
+634
+01:01:14.079 --> 01:01:16.879
+It's just that the demand.
+
+635
+01:01:16.880 --> 01:01:18.880
+You know, every user.
+
+636
+01:01:18.880 --> 01:01:24.400
+I don't really uh depend upon automatic testing or I don't depend upon manual testing.
+
+637
+01:01:24.400 --> 01:01:26.319
+I depend upon the designer.
+
+638
+01:01:26.320 --> 01:01:29.599
+So as I said, I coined the word Vishukurbal.
+
+639
+01:01:29.599 --> 01:01:34.239
+It's just to tell you if you do best, their work is less.
+
+640
+01:01:34.240 --> 01:01:38.480
+But if you don't do your job, then they are going to be paralyzed.
+
+641
+01:01:39.200 --> 01:01:44.319
+They are the ones that will be sewing chicky right into the prison.
+
+642
+01:01:44.320 --> 01:01:47.759
+But you are the ones who go away by saying that we designed it.
+
+643
+01:01:47.760 --> 01:02:01.920
+So you have to look at the critical aspects of it, and what I really want you to understand: the labeling part, which he you know explained very beautifully: the visible text and the visible label, it makes so much of a difference.
+
+644
+01:02:01.920 --> 01:02:09.840
+Even when we do any websites, we will just discuss it during the lunchtime that what are the good uh websites uh from the banking perspective.
+
+645
+01:02:09.840 --> 01:02:11.360
+I love Kotak.
+
+646
+01:02:11.360 --> 01:02:21.920
+It's just like perfect because what happens in Kotak is that it's very navigable and very friendly and similarly if I talk about another banks like uh
+
+647
+01:02:22.800 --> 01:02:30.879
+American Express it's so easy so simple and you know just relevant information that,'s it.
+
+648
+01:02:30.880 --> 01:02:32.319
+Nothing beyond it.
+
+649
+01:02:32.320 --> 01:02:38.960
+And before uh Radika jumps into her presentation, I just wanted to highlight this particular tool.
+
+650
+01:02:38.960 --> 01:02:40.719
+It's just a with it.
+
+651
+01:02:40.720 --> 01:02:44.480
+And unfortunately, this is not Girondpa Pajarvin Surve website.
+
+652
+01:02:44.480 --> 01:02:53.440
+You know, it's just a plugin that's a with a tool which you can just put it and and then you just navigate through it and it says you know uh different things like even uh any
+
+653
+01:02:54.400 --> 01:02:58.320
+any any language that you want to translate it into.
+
+654
+01:02:58.480 --> 01:03:00.480
+You don't have to depend upon anyone.
+
+655
+01:03:00.480 --> 01:03:03.920
+Then if you go to the next, there are things like
+
+656
+01:03:06.320 --> 01:03:21.120
+Caesar safe profile, blind profile visually impaired profile ADHD friendly profile cognitive and learning profile motor impaired profile so it gives you the just you need to click on this and it gives you that kind of an understanding.
+
+657
+01:03:21.440 --> 01:03:34.800
+Okay now what change it has brought here if I just minus this this is what is a change the change in the font and the design and the color contrast and the size this is what we are looking for.
+
+658
+01:03:34.800 --> 01:03:38.000
+And it's not a rocket science, as I said, you can do it easily.
+
+659
+01:03:38.000 --> 01:03:40.880
+It's just that you have to plug in.
+
+660
+01:03:40.880 --> 01:03:51.120
+In the screen reading software, when person like Nambrata is moving, this will come here as a cognitive and learning profile, and then she knows how to switch it off.
+
+661
+01:03:51.760 --> 01:03:56.560
+Okay, I just want to highlight one more thing before I move on.
+
+662
+01:03:56.559 --> 01:03:57.920
+Font size.
+
+663
+01:03:57.920 --> 01:04:05.840
+So currently, I just purposefully before showing it to you, I have adjusted the font size at 100.
+
+664
+01:04:05.840 --> 01:04:11.279
+And I think you want to do at the background, you see this font size is increasing.
+
+665
+01:04:11.280 --> 01:04:16.000
+So people with low vision just have to look up to this widget and then they can increase the whole font size.
+
+666
+01:04:16.000 --> 01:04:19.760
+I'll go back to hundred or more, which is usually what we do.
+
+667
+01:04:19.840 --> 01:04:22.080
+No weight I do.
+
+668
+01:04:22.240 --> 01:04:23.360
+Font weight?
+
+669
+01:04:23.920 --> 01:04:25.279
+Can you see in the background?
+
+670
+01:04:25.280 --> 01:04:27.280
+It's increasing.
+
+671
+01:04:27.280 --> 01:04:29.040
+Line height.
+
+672
+01:04:29.039 --> 01:04:35.520
+So it's just again one more important point that you know different users.
+
+673
+01:04:35.519 --> 01:04:37.279
+Can I have your attention please?
+
+674
+01:04:37.280 --> 01:04:37.839
+Yes.
+
+675
+01:04:37.840 --> 01:04:38.960
+So line he heightight.
+
+676
+01:04:38.960 --> 01:04:42.240
+You know the because the distance, the letter spacing.
+
+677
+01:04:42.240 --> 01:04:49.199
+Some people with dyslexia, learning disabilities, they want letters, the words should not be, the alphabet should not be very close.
+
+678
+01:04:49.200 --> 01:04:51.920
+They want it to be spaced out because it's easy to read.
+
+679
+01:04:51.920 --> 01:04:57.039
+So if you remember the movie, somebody if that time we must have seen Thari is a Vad.
+
+680
+01:04:57.039 --> 01:05:00.960
+So you know the difference between D and E, six and nine.
+
+681
+01:05:00.960 --> 01:05:04.559
+For us, it's like Kya kyap, six and nine different
+
+682
+01:05:05.680 --> 01:05:09.040
+But for them, it's like breaking a kill.
+
+683
+01:05:09.039 --> 01:05:10.559
+Cannot do it at all.
+
+684
+01:05:10.559 --> 01:05:14.160
+So this is what this will do.
+
+685
+01:05:14.159 --> 01:05:16.960
+So this is a dyslexia font.
+
+686
+01:05:17.039 --> 01:05:18.960
+This is a dyslexia font.
+
+687
+01:05:18.960 --> 01:05:22.799
+For you, it will be like a comic kya careo.
+
+688
+01:05:22.800 --> 01:05:28.400
+But for them, it's ready to start R capital, S capital, and gold.
+
+689
+01:05:28.400 --> 01:05:33.520
+So you they can you know pinpoint out how to read this particular
+
+690
+01:05:34.800 --> 01:05:35.440
+sentence
+
+691
+01:05:36.559 --> 01:05:37.840
+highlight links
+
+692
+01:05:42.079 --> 01:05:44.239
+we do it like this because we can see.
+
+693
+01:05:44.240 --> 01:05:47.119
+But this video does it just the highlight.
+
+694
+01:05:47.119 --> 01:05:49.200
+Highlight title.
+
+695
+01:05:49.200 --> 01:05:50.880
+Highlight title.
+
+696
+01:05:50.880 --> 01:05:51.679
+Correct?
+
+697
+01:05:51.680 --> 01:05:59.519
+And then there are also this uh little things like super focus, screen reader, reading guide, big cursor.
+
+698
+01:05:59.519 --> 01:06:02.000
+So this is a big cursor.
+
+699
+01:06:05.680 --> 01:06:08.880
+Paint structure.
+
+700
+01:06:10.800 --> 01:06:22.400
+Monochrom single black and white after no saturation because many people with psychosocial disabilities do not like bright colours.
+
+701
+01:06:22.400 --> 01:06:28.400
+People who have autism, it's really you know, it's like something like making them, oh my god, what's that?
+
+702
+01:06:28.400 --> 01:06:32.319
+It's too dark, so bright, so colourful, cannot comprehend it.
+
+703
+01:06:32.320 --> 01:06:36.080
+So all these things are there high saturation
+
+704
+01:06:37.119 --> 01:06:44.320
+simple plugin and you can do it easily I think Abhiam Janekepan Musa was working on the Pajatsu website with it through to
+
+705
+01:06:45.440 --> 01:06:59.440
+the eighth stock accessibility ka step up ka ajll here and I'll ask Radhika to move on to the next unless if somebody has any questions on experience to hear.
+
+706
+01:07:00.639 --> 01:07:04.719
+The centre table at the back, all okay to go.
+
+707
+01:07:04.720 --> 01:07:06.480
+There are two laptops open.
+
+708
+01:07:10.800 --> 01:08:07.360
+Just open that chat confusion or other open scre Okay, so very good afternoon.
+
+709
+01:08:07.360 --> 01:08:11.519
+Uh now we'll move upon uh specific to designers' perspective.
+
+710
+01:08:11.519 --> 01:08:13.360
+I know a lot of questions about that.
+
+711
+01:08:13.360 --> 01:08:16.800
+What is it like as a designer perspective we have to look into?
+
+712
+01:08:17.039 --> 01:08:33.680
+Basically, from the morning, if you see, we have taken you towards the macro level understanding what is the digital accessibility, who will be benefited, and then we told you what are the guidelines you have to follow and which are the standards, and now coming to this perspective of designer aspect.
+
+713
+01:08:33.680 --> 01:08:36.880
+Okay, what is the criteria that which you have to look into?
+
+714
+01:08:36.880 --> 01:08:53.199
+So, uh, before even getting into my presentation, I'll just quickly run through what is that uh uh you know website uh links which you have to look into to download the guidelines, number one, and number two, with respect to designers and developers, what is the WCHG criteria which you have to refer?
+
+715
+01:08:53.199 --> 01:08:56.000
+Okay.
+
+716
+01:08:56.000 --> 01:09:03.599
+So this is the uh government website where you can download uh JIGW 3.0 document.
+
+717
+01:09:03.600 --> 01:09:05.279
+Okay, and uh
+
+718
+01:09:06.239 --> 01:09:13.840
+already downloaded, and anybody who is leading this whole team you can just share your number so that I can share all the links and the documents with you.
+
+719
+01:09:13.840 --> 01:09:27.039
+Even NBDA manual have to download it and then you can actually run through your website or application so that you can also have feel that a user experience right so all those uh necessary uh URLs I'll share it with you.
+
+720
+01:09:27.039 --> 01:09:27.519
+Okay?
+
+721
+01:09:27.520 --> 01:09:35.039
+So you can go through this and the document.
+
+722
+01:09:39.600 --> 01:09:40.399
+Okay, wait,
+
+723
+01:09:43.039 --> 01:09:53.119
+this is the document which downloaded, okay, gig uh JI GGW 3.0 and here you have other features also specifically we are targeting on accessibility.
+
+724
+01:09:53.119 --> 01:09:56.560
+There's a quality assurance and accessibility, cybersecurity.
+
+725
+01:09:56.560 --> 01:10:00.000
+So there's n number of assessment which will be done for the website.
+
+726
+01:10:00.000 --> 01:10:04.559
+Okay, so now we are concentrating on the one of the important factors that is accessibility.
+
+727
+01:10:04.560 --> 01:10:12.479
+So you have to look into page number 18 and then you will you can refer what is accessibility is all about.
+
+728
+01:10:12.480 --> 01:10:14.639
+Okay.
+
+729
+01:10:14.640 --> 01:10:18.159
+And what is that guidelines which we have to remember?
+
+730
+01:10:18.159 --> 01:10:23.279
+So this will give you an idea.
+
+731
+01:10:23.279 --> 01:10:24.159
+Okay.
+
+732
+01:10:24.159 --> 01:10:28.079
+And this is an interesting document.
+
+733
+01:10:34.960 --> 01:10:54.159
+Okay, so here if you see uh what uh Guru was explaining about WCAG 1.1, 1.2.1 is an interesting uh article which explains and they have actually bifurcated the guidelines as per developer and content editor, you know, and designer perspective also.
+
+734
+01:10:54.159 --> 01:11:02.640
+So I guess this will really add value to you and you can go through so in terms of use of color, we can see the designer tagline is given.
+
+735
+01:11:02.640 --> 01:11:04.880
+So I guess this will solve all your problem.
+
+736
+01:11:04.880 --> 01:11:07.279
+Okay.
+
+737
+01:11:07.279 --> 01:11:17.840
+So here also if you see 1.4.13, content on hover or focus, then again designer aspect here if you see uh about the threshold.
+
+738
+01:11:18.000 --> 01:11:19.119
+So similar way.
+
+739
+01:11:19.119 --> 01:11:21.039
+So this is where you have to refer.
+
+740
+01:11:21.039 --> 01:11:27.680
+And this checklist only we have created uh you know for the testing purpose to make it easy and simplify it.
+
+741
+01:11:27.680 --> 01:11:35.599
+And so we created more and more templates so that we can bifurcate the same guidelines and then distribute to different uh validators.
+
+742
+01:11:35.600 --> 01:11:46.720
+Okay, so moving forward, I hope now uh we have cleared the air what exactly you have to do, which guidelines you have to follow, and what exactly which criteria as a designer you have to look into.

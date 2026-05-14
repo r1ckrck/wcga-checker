@@ -30,6 +30,10 @@ initSettingsPage()
 // at DEFAULT_SETTINGS (key empty) — UI shows the "needs setup" state, which
 // is the right answer either way.
 void loadSettings()
+
+// ── Marker page (designer interactivity overrides) ─────────────────
+import { initMarkingPage, showMarkingPage } from './marking/page.ts'
+initMarkingPage()
 import { buildStat } from './icon-stat.ts'
 
 // Shared timeout for AI-backed fetches (visual review + image-of-text). 60s
@@ -67,6 +71,7 @@ const toastEl = $<HTMLDivElement>('toast')
 const aiIndicatorBtn = $<HTMLButtonElement>('ai-indicator')
 const aiIndicatorState = $<HTMLSpanElement>('ai-indicator-state')
 const settingsCogBtn = $<HTMLButtonElement>('settings-cog')
+const markBtn = $<HTMLButtonElement>('mark-btn')
 
 let lastResult: { dto: AuditDTO; findings: FindingsReport } | null = null
 
@@ -119,6 +124,10 @@ aiIndicatorBtn.addEventListener('click', () => {
 
 settingsCogBtn.addEventListener('click', () => {
   showSettingsPage()
+})
+
+markBtn.addEventListener('click', () => {
+  showMarkingPage()
 })
 
 // Re-render the indicator on every settings change (initial load, save,

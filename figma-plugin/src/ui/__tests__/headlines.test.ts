@@ -22,18 +22,18 @@ test('1.4.5 → static headline', () => {
   assert.equal(headlineFor(flag('1.4.5', 'Image "hero.png" — name suggests text content.')), 'Possible image of text')
 })
 
-test('1.4.12 → property-aware headline', () => {
+test('typography → property-aware headline', () => {
   assert.equal(
-    headlineFor(flag('1.4.12', 'line-height 120% (needs ≥150%).', { property: 'line-height' })),
+    headlineFor(flag('typography', 'line-height 60% (needs ≥75%).', { property: 'line-height' })),
     'Tight line height'
   )
   assert.equal(
-    headlineFor(flag('1.4.12', 'letter-spacing 0% (needs ≥12%).', { property: 'letter-spacing' })),
+    headlineFor(flag('typography', 'letter-spacing -10% (needs ≥-6%).', { property: 'letter-spacing' })),
     'Tight letter spacing'
   )
   assert.equal(
-    headlineFor(flag('1.4.12', 'paragraph-spacing 0% (needs ≥200%).', { property: 'paragraph-spacing' })),
-    'No paragraph spacing'
+    headlineFor(flag('typography', 'paragraph-spacing 40% (needs ≥80%).', { property: 'paragraph-spacing' })),
+    'Tight paragraph spacing'
   )
 })
 

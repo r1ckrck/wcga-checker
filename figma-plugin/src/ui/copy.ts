@@ -46,7 +46,7 @@ export function plainEnglishReason(
 const TYPO_TITLE: Record<string, string> = {
   'line-height': 'Tight line height',
   'letter-spacing': 'Tight letter spacing',
-  'paragraph-spacing': 'No paragraph spacing',
+  'paragraph-spacing': 'Tight paragraph spacing',
   'word-spacing': 'No word spacing',
 }
 
@@ -68,13 +68,14 @@ export function typographyPropertyLabel(property: string): string {
 
 /**
  * Parse a typography "actual" or "required" string emitted by `checkSpacing`
- * (e.g. "157%", "0% (default)", "≥150%", "not set", "120px (1.50x)") into a
- * compact percent number we can drive the bar graph with. Returns null when
- * the string can't be interpreted.
+ * (e.g. "157%", "0% (default)", "≥75%", "-12%", "≥-6%") into a percent number
+ * we can drive the bar graph with. Captures an optional leading minus — the
+ * letter-spacing floor is negative ("≥-6%"), and an "actual" value can be
+ * negative too. Returns null when the string can't be interpreted.
  */
 export function parsePercent(s: string | undefined | null): number | null {
   if (typeof s !== 'string') return null
-  const m = s.match(/(\d+(?:\.\d+)?)\s*%/)
+  const m = s.match(/(-?\d+(?:\.\d+)?)\s*%/)
   if (!m) return null
   const v = Number.parseFloat(m[1])
   return Number.isFinite(v) ? v : null

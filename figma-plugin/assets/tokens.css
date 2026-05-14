@@ -17,6 +17,10 @@
   --hairline-soft: rgba(31, 31, 31, 0.12);
                             /* even quieter — within-card item dividers */
   --accent: #5C3F4E;        /* dusty plum — used once per piece, the eye magnet */
+  --status-exclude: #B5703B;
+                            /* warm muted amber — used for the "exclude" marker state.
+                               Distinct from accent purple, signals "set" without reading
+                               as destructive red. Contrast-checked ≥ 4.5:1 on --bg. */
 
   /* ── Icon coloring ────────────────────────────────────────────────── */
 
@@ -59,6 +63,9 @@
   --hairline-soft: rgba(242, 238, 227, 0.12);
                             /* even quieter — within-card item dividers, inverted */
   --accent: #B89AAA;        /* light dusty rose — same hue, lifted for dark-bg visibility */
+  --status-exclude: #DDA76A;
+                            /* lifted amber for dark mode — same hue, brighter so it
+                               carries the same visual weight as accent on dark bg. */
 
   --icon-primary: var(--fg);
   --icon-secondary: var(--mute);

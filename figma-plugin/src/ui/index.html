@@ -23,6 +23,16 @@
           <span class="ai-indicator__state" id="ai-indicator-state">not set up</span>
         </button>
         <button
+          class="header__mark"
+          id="mark-btn"
+          type="button"
+          aria-label="Mark interactive elements"
+          title="Mark interactive elements"
+        >
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-cursor-click"/></svg>
+          <span class="header__mark-label">Mark</span>
+        </button>
+        <button
           class="header__cog"
           id="settings-cog"
           type="button"
@@ -135,6 +145,21 @@
               <span class="btn__label">Save</span>
             </button>
           </div>
+        </div>
+      </section>
+
+      <!-- Marking page — full-panel swap, sibling of #main and #settings-page.
+           Hidden until the header Mark button opens it. -->
+      <section class="marking-page" id="marking-page" hidden aria-labelledby="marking-page-title">
+        <header class="marking-page__header">
+          <button class="marking-page__close" id="marking-close" type="button" aria-label="Close marking page">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-left"/></svg>
+          </button>
+          <h2 class="marking-page__title" id="marking-page-title">Mark interactive elements</h2>
+        </header>
+
+        <div class="marking-page__body" id="marking-body" aria-live="polite">
+          <!-- Populated by src/ui/marking/page.ts. Commit 1: placeholder text. -->
         </div>
       </section>
 

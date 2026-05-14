@@ -21,6 +21,7 @@ const emptyDTO = (over: Partial<AuditDTO> = {}): AuditDTO => ({
   interactives: [],
   images: [],
   formInputs: [],
+  clickables: [],
   variants: null,
   warnings: [],
   ...over,
@@ -58,6 +59,7 @@ const textEl = (over: Partial<TextElement>): TextElement => ({
   characters: over.characters ?? 'Hello',
   isSingleLine: over.isSingleLine ?? true,
   isSingleVisualLine: over.isSingleVisualLine ?? true,
+  paragraphSpacingPx: over.paragraphSpacingPx ?? null,
   segments: over.segments ?? [
     {
       start: 0,

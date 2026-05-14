@@ -4,6 +4,7 @@
 import type { AuditDTO } from './dtos'
 import type { Finding, FindingsReport } from '../checks/findings.ts'
 import type { AiSettings } from './settings.ts'
+import type { MarkersFile } from './markers.ts'
 
 export type UIToMain =
   | { kind: 'init' }
@@ -14,6 +15,10 @@ export type UIToMain =
   // ── Settings (per-user AI key + provider, persisted via figma.clientStorage) ──
   | { kind: 'settings-load' }
   | { kind: 'settings-save'; settings: AiSettings }
+  // ── Markers (designer-set interactivity overrides, per-file) ──
+  | { kind: 'markers-load' }
+  | { kind: 'markers-save'; markers: MarkersFile }
+  | { kind: 'marker-watch'; on: boolean }
 
 export type MainToUI =
   | { kind: 'state'; selection: SelectionInfo }
@@ -53,6 +58,46 @@ export type MainToUI =
   | { kind: 'settings-loaded'; settings: AiSettings }
   | { kind: 'settings-saved' }
   | { kind: 'settings-error'; reason: string }
+  // ── Markers round-trip + ANY-node selection stream ─────────────────────
+  | { kind: 'markers-loaded'; fileKey: string | null; markers: MarkersFile }
+  | { kind: 'markers-saved' }
+  | { kind: 'markers-error'; reason: MarkersErrorReason }
+  | {
+      kind: 'marker-state'
+      selection: AnyNodeSelectionInfo
+      descendantInteractives: DescendantInteractive[]
+    }
+
+export type MarkersErrorReason = 'no-file-key' | 'storage-failed' | 'parse-failed'
+
+/**
+ * Distinct from `SelectionInfo` — admits any SceneNode type (vectors, icons,
+ * text, etc.) for the marking page. `state` (above) stays filtered to the
+ * four supported audit roots; `marker-state` carries this richer info only
+ * while the marking page is open (gated by `marker-watch`).
+ */
+export type AnyNodeSelectionInfo =
+  | { kind: 'none' }
+  | { kind: 'multiple'; count: number }
+  | {
+      kind: 'any'
+      id: string
+      name: string
+      nodeType: string // raw Figma NodeType — wider than SupportedNodeType
+      width: number
+      height: number
+      /** False for PAGE / DOCUMENT (and any future non-markable roots). */
+      canMark: boolean
+    }
+
+/** A row in the marking-page descendant list. */
+export interface DescendantInteractive {
+  id: string
+  name: string
+  nodeType: string
+  /** True when the classifier already auto-detected this node — drives the "auto" pill. */
+  detected: boolean
+}
 
 export type SelectionInfo =
   | { kind: 'none' }

@@ -10,7 +10,14 @@
 //     `figma.notify` so unexpected throws never leave the user staring
 //     at a dead plugin.
 
-import type { MainToUI, SelectionInfo, UIToMain, SupportedNodeType } from '../shared/protocol'
+import type {
+  AnyNodeSelectionInfo,
+  DescendantInteractive,
+  MainToUI,
+  SelectionInfo,
+  SupportedNodeType,
+  UIToMain,
+} from '../shared/protocol'
 import type { AuditDTO } from '../shared/dtos'
 import {
   DEFAULT_SETTINGS,
@@ -18,7 +25,19 @@ import {
   SETTINGS_STORAGE_KEY,
   type AiSettings,
 } from '../shared/settings.ts'
+import {
+  EMPTY_MARKERS_FILE,
+  MARKERS_STORAGE_KEY,
+  getFileMarkers,
+  parseMarkersStore,
+  pruneFileMarkers,
+  setFileMarkers,
+  type MarkersFile,
+} from '../shared/markers.ts'
 import { buildAuditDTO } from '../read/index.ts'
+import { collect } from '../read/traverse.ts'
+import { buildClickableElements } from '../read/interactivity.ts'
+import { buildFormInputElements } from '../read/form-input.ts'
 import { runChecks, runVariantChecks } from '../checks/orchestrator.ts'
 import { tryExportAll } from './try-export-all.ts'
 
@@ -193,8 +212,423 @@ function postCurrentState(): void {
   send({ kind: 'state', selection: classifySelection() })
 }
 
-figma.on('selectionchange', postCurrentState)
-figma.on('currentpagechange', postCurrentState)
+// ── Marker-mode selection emission ────────────────────────────────────
+// `marker-state` is a parallel selection stream for the marking page. It
+// accepts ANY SceneNode (vectors, icons, text — not just the four supported
+// audit roots) and is gated by `markerWatchOn` so we don't pay the descendant
+// walk outside the marking page. The audit-mode `state` stream above stays
+// untouched.
+
+let markerWatchOn = false
+
+function classifyForMarking(): AnyNodeSelectionInfo {
+  const sel = figma.currentPage.selection
+  if (sel.length === 0) return { kind: 'none' }
+  if (sel.length > 1) return { kind: 'multiple', count: sel.length }
+  const node = sel[0]
+  // PAGE / DOCUMENT are not SceneNodes and can't appear in currentPage.selection,
+  // so any selected node is markable by construction. The `canMark` field is
+  // kept on the wire for future-proofing (e.g. a slide-context extension).
+  return {
+    kind: 'any',
+    id: node.id,
+    name: node.name,
+    nodeType: node.type,
+    width: Math.round(node.width),
+    height: Math.round(node.height),
+    canMark: true,
+  }
+}
+
+/** Hard cap on rows returned to the UI. Anything beyond this gets dropped;
+ * the UI surfaces an overflow tail so the designer knows. */
+const DESCENDANT_LIST_CAP = 200
+
+/** Heuristic icon-shape bounds. An INSTANCE descendant with no text inside
+ * and bbox sitting in this size + aspect window is *probably* a tap-target
+ * icon (chevron, voice mic, play, info, etc.). We don't auto-classify these
+ * as clickable in the audit (false positives would generate phantom flags)
+ * but we DO surface them as marking-page candidates so designers can opt
+ * them in. */
+const ICON_MIN_PX = 12
+const ICON_MAX_PX = 80
+const ICON_ASPECT_MIN = 0.7
+const ICON_ASPECT_MAX = 1.4
+
+/** True if `node` sits anywhere inside `ancestor`'s subtree. Bails at PAGE /
+ * DOCUMENT so we don't walk the whole document for a stale id. */
+function isDescendantOf(node: BaseNode, ancestor: BaseNode): boolean {
+  let p: BaseNode | null = node.parent
+  while (p) {
+    if (p.id === ancestor.id) return true
+    if (p.type === 'PAGE' || p.type === 'DOCUMENT') return false
+    p = p.parent
+  }
+  return false
+}
+
+/** True if any ancestor between `node` and `root` (exclusive on both ends —
+ * we don't consider the node itself or the root) is in the Include set.
+ * Used to suppress descendants of Include-marked nodes from the marking-page
+ * list: when a node is marked Include, everything inside it is hidden, no
+ * matter how deeply nested or which frame is currently selected. */
+function hasIncludeMarkedAncestor(
+  node: BaseNode,
+  rootId: string,
+  includeSet: Set<string>
+): boolean {
+  if (includeSet.size === 0) return false
+  let p: BaseNode | null = node.parent
+  while (p) {
+    if (p.id === rootId) return false
+    if (p.type === 'PAGE' || p.type === 'DOCUMENT') return false
+    if (includeSet.has(p.id)) return true
+    p = p.parent
+  }
+  return false
+}
+
+/** True if the node has any visible TEXT descendant. Excludes labelled
+ * components (Button/Chip/MenuItem) from the icon-only heuristic — those
+ * already classify via the classifier's name regex. */
+function hasVisibleTextDescendant(node: SceneNode): boolean {
+  if (node.type === 'TEXT') return node.visible !== false
+  if (!('findOne' in node)) return false
+  const hit = (node as FrameNode).findOne(
+    n => n.type === 'TEXT' && n.visible !== false
+  )
+  return hit !== null
+}
+
+/** Icon-shape filter — used to surface unwrapped icon instances (chevron,
+ * voice, play, etc.) as marking-page candidates even when their names don't
+ * match the classifier's include list. */
+function isIconShape(node: SceneNode): boolean {
+  const bbox = node.absoluteBoundingBox
+  if (!bbox) return false
+  const w = bbox.width
+  const h = bbox.height
+  if (w < ICON_MIN_PX || h < ICON_MIN_PX) return false
+  if (w > ICON_MAX_PX || h > ICON_MAX_PX) return false
+  if (h === 0) return false
+  const ratio = w / h
+  return ratio >= ICON_ASPECT_MIN && ratio <= ICON_ASPECT_MAX
+}
+
+/**
+ * Walk the selected subtree and surface (a) classifier-detected interactives
+ * plus (b) any include-marked nodes that live anywhere inside it. The two
+ * sets are unioned and deduped — a node detected by the classifier AND
+ * marked by the user appears once, with `detected: true` (the auto pill
+ * still hides because the marker state is non-neutral when the row renders).
+ *
+ * Returns at most `DESCENDANT_LIST_CAP` rows; the UI tail-renders an overflow
+ * notice when the result is at the cap.
+ */
+async function collectDescendantInteractives(
+  rootId: string,
+  file: MarkersFile
+): Promise<DescendantInteractive[]> {
+  // 1. Resolve the root and bail on anything we can't traverse.
+  const root = await figma.getNodeByIdAsync(rootId).catch(() => null)
+  if (!root) return []
+  if (!('findAllWithCriteria' in root)) {
+    // Leaf-type roots (VECTOR / TEXT) — nothing inside to list. Honour the
+    // user's include marker on the root itself indirectly through the
+    // selection card, not the list.
+    return []
+  }
+  const rootScene = root as SceneNode
+
+  // 2. Mirror the read pipeline's traversal so descendant classification
+  //    matches what the audit would emit. Failures here yield empty lists
+  //    rather than crashing the marking page.
+  let collected: ReturnType<typeof collect>
+  try {
+    collected = collect(rootScene)
+  } catch {
+    return []
+  }
+
+  // 3. Identify form-input ids first so the clickable classifier can skip
+  //    them (matches read/index.ts ordering).
+  let formInputIds: string[] = []
+  try {
+    const formInputs = await buildFormInputElements(collected.instances)
+    formInputIds = formInputs.map(f => f.id)
+  } catch {
+    formInputIds = []
+  }
+
+  // 4. Run the classifier — same function the audit calls.
+  let clickables: Array<{ id: string; name: string }> = []
+  try {
+    clickables = await buildClickableElements(
+      rootScene,
+      collected.instances,
+      formInputIds
+    )
+  } catch {
+    clickables = []
+  }
+
+  // 5. Build an id→SceneNode lookup for fast node-type retrieval. The same
+  //    nodes are already in memory courtesy of collect(), so this is cheap.
+  const nodeById = new Map<string, SceneNode>()
+  nodeById.set(rootScene.id, rootScene)
+  for (const t of collected.texts) nodeById.set(t.id, t)
+  for (const v of collected.vectors) nodeById.set(v.id, v)
+  for (const s of collected.shapes) nodeById.set(s.id, s)
+  for (const i of collected.instances) nodeById.set(i.id, i)
+
+  // 6. Resolve form inputs alongside clickables — they're interactive too,
+  //    just classified separately for the audit's 3.3.2 pipeline. Designers
+  //    expect to see them in the marking list.
+  let formInputs: Array<{ id: string; name: string }> = []
+  try {
+    formInputs = await buildFormInputElements(collected.instances)
+  } catch {
+    formInputs = []
+  }
+
+  // Build the Include set up-front so every pass can skip descendants of any
+  // Include-marked node. The rule: when a node is marked Include, everything
+  // inside it is hidden from the list — the marker is the whole story for
+  // that branch.
+  const includeSet = new Set(file.include)
+
+  // 7. Classifier-detected rows. Skip the root itself — it's surfaced by the
+  //    selection card, not the list.
+  const seen = new Set<string>()
+  const rows: DescendantInteractive[] = []
+  for (const c of clickables) {
+    if (c.id === rootId) continue
+    if (seen.has(c.id)) continue
+    const node = nodeById.get(c.id)
+    if (node && hasIncludeMarkedAncestor(node, rootId, includeSet)) continue
+    seen.add(c.id)
+    rows.push({
+      id: c.id,
+      name: c.name,
+      nodeType: node?.type ?? 'UNKNOWN',
+      detected: true,
+    })
+    if (rows.length >= DESCENDANT_LIST_CAP) return rows
+  }
+
+  // 8. Form inputs — definitely interactive, surface them as auto-detected.
+  for (const fi of formInputs) {
+    if (fi.id === rootId) continue
+    if (seen.has(fi.id)) continue
+    const node = nodeById.get(fi.id)
+    if (node && hasIncludeMarkedAncestor(node, rootId, includeSet)) continue
+    seen.add(fi.id)
+    rows.push({
+      id: fi.id,
+      name: fi.name,
+      nodeType: node?.type ?? 'INSTANCE',
+      detected: true,
+    })
+    if (rows.length >= DESCENDANT_LIST_CAP) return rows
+  }
+
+  // 9. Icon-only INSTANCE descendants — likely tap targets the classifier
+  //    didn't catch by name. Designers can confirm via Include or override
+  //    via Exclude on the marking page. These are intentionally NOT promoted
+  //    to the classifier itself (the audit doesn't want decorative icons
+  //    flagged), only surfaced here for designer review.
+  for (const inst of collected.instances) {
+    if (inst.id === rootId) continue
+    if (seen.has(inst.id)) continue
+    if (hasVisibleTextDescendant(inst)) continue
+    if (!isIconShape(inst)) continue
+    if (hasIncludeMarkedAncestor(inst, rootId, includeSet)) continue
+    seen.add(inst.id)
+    rows.push({
+      id: inst.id,
+      name: inst.name,
+      nodeType: inst.type,
+      detected: true,
+    })
+    if (rows.length >= DESCENDANT_LIST_CAP) return rows
+  }
+
+  // 10. Include-marked union — any node the user explicitly marked Include
+  //     that lives inside this subtree but wasn't surfaced above. Resolved
+  //     lazily one at a time; if a marker has gone stale (deleted node) we
+  //     skip silently and let the prune cycle clean it up later. We DO still
+  //     skip include-marked nodes that themselves sit inside another
+  //     Include-marked node — same rule as everywhere else.
+  for (const id of file.include) {
+    if (seen.has(id)) continue
+    if (id === rootId) continue
+    const node = await figma.getNodeByIdAsync(id).catch(() => null)
+    if (!node) continue
+    if (!isDescendantOf(node, rootScene)) continue
+    if (hasIncludeMarkedAncestor(node, rootId, includeSet)) continue
+    rows.push({
+      id,
+      name: node.name,
+      nodeType: node.type,
+      detected: false,
+    })
+    seen.add(id)
+    if (rows.length >= DESCENDANT_LIST_CAP) return rows
+  }
+
+  return rows
+}
+
+async function emitMarkerState(file: MarkersFile = EMPTY_MARKERS_FILE): Promise<void> {
+  if (!markerWatchOn) return
+  const selection = classifyForMarking()
+  const descendantInteractives =
+    selection.kind === 'any'
+      ? await collectDescendantInteractives(selection.id, file)
+      : []
+  send({ kind: 'marker-state', selection, descendantInteractives })
+}
+
+// In-memory cache of the current file's markers — refreshed on load/save,
+// consulted by `emitMarkerState` so we don't round-trip clientStorage on every
+// selectionchange tick.
+let currentFileMarkers: MarkersFile = EMPTY_MARKERS_FILE
+
+/** File-scope id used to key the per-file slot in clientStorage.
+ *
+ * `figma.fileKey` is only exposed for private organization plugins published
+ * with `enablePrivatePluginApi`. Local-dev and public-published plugins always
+ * see `undefined`. To still scope markers per file we generate an opaque UUID
+ * once and stash it in the file's shared plugin data — the file becomes
+ * self-identifying without leaking any sensitive payload (the actual markers
+ * live in clientStorage, per-user, never in the document).
+ *
+ * Trade-off: when the same Figma file is opened on a different machine the
+ * UUID travels with the file, so the same identifier resolves to that
+ * machine's (per-user, possibly empty) clientStorage slot. That matches the
+ * spec — markers don't sync across machines, but the file identity is stable.
+ */
+// Figma's `setSharedPluginData` requires the namespace to be "at least 3
+// alphanumeric characters." Hyphens (and other non-alphanumerics) cause the
+// call to throw, which previously hit our silent catch and falsely surfaced
+// the "Dev Mode is read-only" message. Keep this strictly alphanumeric.
+const FILE_ID_NAMESPACE = 'wcagauditor'
+const FILE_ID_KEY = 'fileidv1'
+
+function generateFileId(): string {
+  // Not cryptographically meaningful — just unique enough to label one file
+  // distinctly from another. RFC 4122 isn't necessary here.
+  const a = Date.now().toString(36)
+  const b = Math.random().toString(36).slice(2, 10)
+  const c = Math.random().toString(36).slice(2, 10)
+  return `${a}-${b}-${c}`
+}
+
+function getFileScopeId(): string | null {
+  // Path 1 — official fileKey for private org plugins. Returns immediately
+  // when available; almost no local-dev plugins hit this branch.
+  if (figma.fileKey) return figma.fileKey
+
+  // Path 2 — read a previously-stashed UUID from the document. Works in
+  // both editor mode and dev mode (reads don't require write access).
+  let existing = ''
+  try {
+    existing = figma.root.getSharedPluginData(FILE_ID_NAMESPACE, FILE_ID_KEY)
+  } catch (e) {
+    // Defensive: any error here is unexpected. Log so we don't silently
+    // mistake it for "no file id available".
+    // eslint-disable-next-line no-console
+    console.error('[wcag-auditor] getSharedPluginData failed:', e)
+    existing = ''
+  }
+  if (existing) return existing
+
+  // Path 3 — create + persist a fresh UUID. Writes require write access to
+  // the document; dev mode is read-only and will throw. Anything else (a
+  // namespace constraint violation, a permissions edge case) should be
+  // logged loudly so it doesn't masquerade as "dev mode".
+  try {
+    const fresh = generateFileId()
+    figma.root.setSharedPluginData(FILE_ID_NAMESPACE, FILE_ID_KEY, fresh)
+    return fresh
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('[wcag-auditor] setSharedPluginData failed:', e)
+    return null
+  }
+}
+
+/** Batched parallel node-id resolution. Drops only ids that resolve to `null`;
+ * keeps ids that threw (transient lookup failures shouldn't permanently
+ * destroy valid markers). */
+async function collectValidIds(ids: string[]): Promise<Set<string>> {
+  const valid = new Set<string>()
+  const BATCH = 50
+  for (let i = 0; i < ids.length; i += BATCH) {
+    const batch = ids.slice(i, i + BATCH)
+    const results = await Promise.all(
+      batch.map(async id => {
+        try {
+          const node = await figma.getNodeByIdAsync(id)
+          return node ? id : null
+        } catch {
+          // Transient — keep the id rather than drop a potentially-valid marker.
+          return id
+        }
+      })
+    )
+    for (const id of results) {
+      if (id) valid.add(id)
+    }
+  }
+  return valid
+}
+
+/** Load markers for the current file from clientStorage, prune stale ids,
+ * persist if pruning changed anything, and return the resolved set. Throws
+ * on storage failure; caller maps to `markers-error`. */
+async function loadAndPruneMarkers(): Promise<{
+  fileKey: string | null
+  markers: MarkersFile
+}> {
+  const fileKey = getFileScopeId()
+  if (!fileKey) {
+    return { fileKey: null, markers: EMPTY_MARKERS_FILE }
+  }
+  const raw = await figma.clientStorage.getAsync(MARKERS_STORAGE_KEY)
+  const store = parseMarkersStore(raw)
+  const file = getFileMarkers(store, fileKey)
+
+  const allIds = [...file.include, ...file.exclude]
+  if (allIds.length === 0) return { fileKey, markers: file }
+
+  const validIds = await collectValidIds(allIds)
+  const pruned = pruneFileMarkers(file, validIds)
+
+  // Persist pruned state if anything changed; non-fatal if persistence fails.
+  if (
+    pruned.include.length !== file.include.length ||
+    pruned.exclude.length !== file.exclude.length
+  ) {
+    try {
+      const nextStore = setFileMarkers(store, fileKey, pruned)
+      await figma.clientStorage.setAsync(MARKERS_STORAGE_KEY, nextStore)
+    } catch {
+      // Surfacing this would be noisy and unhelpful — the user can still
+      // read/write markers; the cleanup just retries on the next plugin run.
+    }
+  }
+  return { fileKey, markers: pruned }
+}
+
+figma.on('selectionchange', () => {
+  postCurrentState()
+  void emitMarkerState(currentFileMarkers)
+})
+figma.on('currentpagechange', () => {
+  postCurrentState()
+  void emitMarkerState(currentFileMarkers)
+})
 
 figma.ui.onmessage = async (msg: UIToMain) => {
   try {
@@ -211,7 +645,25 @@ figma.ui.onmessage = async (msg: UIToMain) => {
         }
         const node = sel[0]
         try {
-          const dto = await buildAuditDTO(node)
+          // Resolve designer-set markers for the current file so the
+          // classifier can honour Include / Exclude overrides. Stale ids
+          // are silently pruned by `loadAndPruneMarkers`. Missing fileKey
+          // → empty markers, audit runs as if no overrides exist.
+          let auditMarkers: MarkersFile = EMPTY_MARKERS_FILE
+          try {
+            const { markers } = await loadAndPruneMarkers()
+            auditMarkers = markers
+            currentFileMarkers = markers
+          } catch {
+            // Storage read failed — proceed without markers. Better partial
+            // audit than no audit.
+          }
+          const dto = await buildAuditDTO(node, {
+            markers: {
+              include: new Set(auditMarkers.include),
+              exclude: new Set(auditMarkers.exclude),
+            },
+          })
           // Run deterministic checks, screenshot export, image-of-text
           // candidates, and per-variant thumbs in parallel — all four are
           // independent. Individual failures fall through to empty/null.
@@ -295,6 +747,56 @@ figma.ui.onmessage = async (msg: UIToMain) => {
           send({ kind: 'settings-saved' })
         } catch (e) {
           send({ kind: 'settings-error', reason: `failed to save settings: ${String(e)}` })
+        }
+        return
+      }
+      // ── Markers (per-file interactivity overrides) ──────────────────
+      case 'markers-load': {
+        try {
+          const { fileKey, markers } = await loadAndPruneMarkers()
+          currentFileMarkers = markers
+          if (!fileKey) {
+            // Marking is unavailable in this file context (rare: certain
+            // playground / pre-save states). UI renders read-only with toast.
+            send({ kind: 'markers-error', reason: 'no-file-key' })
+            send({ kind: 'markers-loaded', fileKey: null, markers: EMPTY_MARKERS_FILE })
+            return
+          }
+          send({ kind: 'markers-loaded', fileKey, markers })
+        } catch (_e) {
+          currentFileMarkers = EMPTY_MARKERS_FILE
+          send({ kind: 'markers-error', reason: 'storage-failed' })
+          send({ kind: 'markers-loaded', fileKey: null, markers: EMPTY_MARKERS_FILE })
+        }
+        return
+      }
+      case 'markers-save': {
+        const fileKey = getFileScopeId()
+        if (!fileKey) {
+          send({ kind: 'markers-error', reason: 'no-file-key' })
+          return
+        }
+        try {
+          const raw = await figma.clientStorage.getAsync(MARKERS_STORAGE_KEY)
+          const store = parseMarkersStore(raw)
+          const nextStore = setFileMarkers(store, fileKey, msg.markers)
+          await figma.clientStorage.setAsync(MARKERS_STORAGE_KEY, nextStore)
+          currentFileMarkers = getFileMarkers(nextStore, fileKey)
+          send({ kind: 'markers-saved' })
+          // Re-emit marker-state so the UI's row list reflects any include set
+          // changes immediately (commit 3 will use this for auto-row stamping).
+          void emitMarkerState(currentFileMarkers)
+        } catch (_e) {
+          send({ kind: 'markers-error', reason: 'storage-failed' })
+        }
+        return
+      }
+      case 'marker-watch': {
+        markerWatchOn = msg.on
+        if (msg.on) {
+          // Synthetic emit so the page paints without waiting for the user
+          // to wiggle the cursor.
+          void emitMarkerState(currentFileMarkers)
         }
         return
       }

@@ -16,7 +16,17 @@ import { buildTextElement } from './text.ts'
 import { buildInteractiveElements } from './interactive.ts'
 import { buildImageElements } from './image.ts'
 import { buildFormInputElements } from './form-input.ts'
+import {
+  buildClickableElements,
+  type MarkersForClassifier,
+} from './interactivity.ts'
 import { extractVariants } from './variants.ts'
+
+export interface BuildAuditOptions {
+  /** Designer-set marker overrides applied during clickable classification.
+   *  Optional — default `{}` preserves all existing test behaviour. */
+  markers?: MarkersForClassifier
+}
 
 const SUPPORTED: ReadonlyArray<SupportedComponentType> = [
   'COMPONENT',
@@ -45,7 +55,10 @@ function buildMeta(root: SceneNode): ComponentMeta {
   }
 }
 
-export async function buildAuditDTO(root: SceneNode): Promise<AuditDTO> {
+export async function buildAuditDTO(
+  root: SceneNode,
+  opts: BuildAuditOptions = {}
+): Promise<AuditDTO> {
   const warnings: string[] = []
   const collected = collect(root)
 
@@ -62,6 +75,17 @@ export async function buildAuditDTO(root: SceneNode): Promise<AuditDTO> {
     safe(() => extractVariants(root), warnings),
   ])
 
+  // Clickables depend on the resolved form-input id set so we can exclude
+  // them; run as a second async step rather than parallel-with-formInputs.
+  // Markers (if any) flow through to override classification:
+  //   - id ∈ exclude → never classified as clickable
+  //   - id ∈ include → forced into the list with signal 'designer-marked'
+  const formInputIds = formInputs.map(f => f.id)
+  const clickables = await safeArray(
+    () => buildClickableElements(root, collected.instances, formInputIds, opts.markers),
+    warnings
+  )
+
   const images = buildImageElements(collected.imageBearing)
 
   return {
@@ -70,6 +94,7 @@ export async function buildAuditDTO(root: SceneNode): Promise<AuditDTO> {
     interactives,
     images,
     formInputs,
+    clickables,
     variants: variants ?? null,
     warnings,
   }

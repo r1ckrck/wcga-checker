@@ -1,10 +1,15 @@
-// 1.4.5 Image of Text and 1.4.12 Text Spacing. Pure DTO consumer.
+// Typography readability + 1.4.5 Image of Text. Pure DTO consumer.
+//
+// Typography findings use criterion `'typography'` (not a WCAG SC) because
+// these are general readability floors, not 1.4.12. The reflow check (future)
+// will pick up the actual 1.4.12 SC. See PLAN.md.
 
 import type { AuditDTO, ImageElement, TextElement, TextSegment } from '../../shared/dtos'
 import type { Finding } from '../findings.ts'
 import { checkSpacing } from '../typography.ts'
 
 const TEXT_NAME_RE = /text|heading|title|label|copy/i
+const TYPOGRAPHY_CRITERION = 'typography'
 
 export function runTypographyCheck(dto: AuditDTO): Finding[] {
   const findings: Finding[] = []
@@ -25,7 +30,7 @@ function auditTextSpacing(text: TextElement): Finding[] {
   const seg = pickAuditSegment(text.segments)
   if (!seg) {
     out.push({
-      criterion: '1.4.12',
+      criterion: TYPOGRAPHY_CRITERION,
       status: 'unable-to-test',
       scope: 'element',
       nodeId: text.id,
@@ -35,9 +40,10 @@ function auditTextSpacing(text: TextElement): Finding[] {
     return out
   }
 
-  // AUTO line height = no fixed constraint = automatic pass (parent skill rule):
-  // we drop the line-height entry from the results entirely rather than treat
-  // it as unable-to-determine.
+  // AUTO line-height = no fixed constraint = drop the line-height check
+  // entirely. (The paragraph-spacing math still uses a 1.2× fontSize fallback
+  // internally — that's an approximation; the line-height check itself is the
+  // one that can't be evaluated against AUTO.)
   const isAutoLineHeight = seg.lineHeightUnit === 'AUTO'
   const lineHeight = isAutoLineHeight ? undefined : (seg.lineHeightPx ?? null)
 
@@ -45,8 +51,7 @@ function auditTextSpacing(text: TextElement): Finding[] {
     fontSize: seg.fontSize,
     lineHeight,
     letterSpacing: seg.letterSpacingPx,
-    paragraphSpacing: null,
-    wordSpacing: null,
+    paragraphSpacing: text.paragraphSpacingPx,
     singleLine: text.isSingleLine,
   })
 
@@ -66,7 +71,7 @@ function auditTextSpacing(text: TextElement): Finding[] {
     if (r.pass === true) continue
     if (r.pass === null) {
       out.push({
-        criterion: '1.4.12',
+        criterion: TYPOGRAPHY_CRITERION,
         status: 'unable-to-test',
         scope: 'element',
         nodeId: text.id,
@@ -76,7 +81,7 @@ function auditTextSpacing(text: TextElement): Finding[] {
       })
     } else {
       out.push({
-        criterion: '1.4.12',
+        criterion: TYPOGRAPHY_CRITERION,
         status: 'flag',
         scope: 'element',
         nodeId: text.id,
@@ -90,12 +95,12 @@ function auditTextSpacing(text: TextElement): Finding[] {
   // No flags emitted → record a pass for this element.
   if (out.length === 0) {
     out.push({
-      criterion: '1.4.12',
+      criterion: TYPOGRAPHY_CRITERION,
       status: 'pass',
       scope: 'element',
       nodeId: text.id,
       nodeName: text.name,
-      message: '1.4.12 — text spacing meets minimums.',
+      message: 'Typography — readability floors met.',
     })
   }
   return out

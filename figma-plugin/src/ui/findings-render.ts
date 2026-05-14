@@ -39,6 +39,11 @@ export interface RenderCallbacks {
  * placeholder "no variant designed" entries on every audit. */
 const VARIANT_CRITERIA = new Set(['1.4.1', '2.4.7', '3.3.1', '3.3.3'])
 
+/** True when the criterion string looks like a WCAG SC code (X.Y or X.Y.Z). */
+function isWcagCode(criterion: string): boolean {
+  return /^\d+\.\d+(\.\d+)?$/.test(criterion)
+}
+
 export function renderFindingsCards(
   host: HTMLElement,
   dto: AuditDTO,
@@ -144,17 +149,22 @@ function buildFindingItem(
   const item = document.createElement('div')
   item.className = 'finding-item'
 
-  // Row 1: title left, criterion code right.
+  // Row 1: title left, criterion code right (only when the criterion is a
+  // standard WCAG SC like "1.4.3" or "2.4.7" — non-SC criteria like
+  // "typography" are general design opinion, not standards, and shouldn't
+  // surface a code in the UI).
   const titleRow = document.createElement('div')
   titleRow.className = 'finding-item__title-row'
   const titleEl = document.createElement('span')
   titleEl.className = 'finding-item__title'
   titleEl.textContent = headlineFor(grouped.representative)
   titleRow.appendChild(titleEl)
-  const codeEl = document.createElement('span')
-  codeEl.className = 'finding-item__code'
-  codeEl.textContent = grouped.representative.criterion
-  titleRow.appendChild(codeEl)
+  if (isWcagCode(grouped.representative.criterion)) {
+    const codeEl = document.createElement('span')
+    codeEl.className = 'finding-item__code'
+    codeEl.textContent = grouped.representative.criterion
+    titleRow.appendChild(codeEl)
+  }
   item.appendChild(titleRow)
 
   // Row 2: clickable element names. Skip when scope is component-level
@@ -199,12 +209,14 @@ function buildVisualForCriterion(
       return buildContrastVisual(f, dto, 'text')
     case '1.4.11':
       return buildContrastVisual(f, dto, 'element')
-    case '1.4.12':
+    case 'typography':
       return buildSpacingVisual(f, dto)
     case '3.3.2':
       return buildLabelVisual(grouped, dto)
     case '1.4.5':
       return buildImageOfTextRowVisual(f)
+    case '2.4.4':
+      return buildLinkPurposeVisual(f)
     default:
       return null
   }
@@ -490,15 +502,32 @@ function formatSpacingValue(
 function buildSpacingBar(actual: number | null, required: number | null): HTMLElement {
   const wrap = document.createElement('div')
   wrap.className = 'spacing-bar'
-  if (typeof actual !== 'number' || typeof required !== 'number' || required <= 0) {
+  if (typeof actual !== 'number' || typeof required !== 'number') {
     wrap.classList.add('spacing-bar--empty')
     return wrap
   }
-  // Normalize: actual relative to required, capped at 100% of bar width.
-  // Cap visual scale at 1.5x required so a 200% case doesn't dominate.
-  const scaleMax = required * 1.5
-  const actualPct = Math.min(100, Math.max(0, (actual / scaleMax) * 100))
-  const reqPct = Math.min(100, Math.max(0, (required / scaleMax) * 100))
+  // Build a visual range where the threshold sits at ~67% of the bar. Works
+  // for positive thresholds (e.g. line-height ≥ 75%) AND negative thresholds
+  // (e.g. letter-spacing ≥ -6%) by using `|required|` as the visual unit and
+  // shifting the origin so the threshold lands at the same place either way.
+  //
+  //   scaleMin = required - |required|      (one full step below threshold)
+  //   scaleMax = required + |required|/2    (half step above for headroom)
+  //   threshold position  = 67% on the bar (consistent across signs)
+  const span = Math.abs(required)
+  if (span === 0) {
+    wrap.classList.add('spacing-bar--empty')
+    return wrap
+  }
+  const scaleMin = required - span
+  const scaleMax = required + span * 0.5
+  const range = scaleMax - scaleMin
+
+  const norm = (v: number): number =>
+    Math.min(100, Math.max(0, ((v - scaleMin) / range) * 100))
+
+  const actualPct = norm(actual)
+  const reqPct = norm(required)
 
   const fill = document.createElement('span')
   fill.className = 'spacing-bar__fill'
@@ -555,6 +584,32 @@ function buildLabelVisual(grouped: GroupedFinding, dto: AuditDTO): HTMLElement {
   dotRow.appendChild(buildSeverityDot('severe'))
   wrap.appendChild(dotRow)
 
+  return wrap
+}
+
+// ── 2.4.4 — quoted offending text + mild severity dot ───────────────
+
+function buildLinkPurposeVisual(f: Finding): HTMLElement {
+  const wrap = document.createElement('div')
+  wrap.className = 'finding-item__visual finding-item__visual--link-purpose'
+
+  // Wrap text + dot in a `.finding-item__numerics` row so the text expands
+  // (flex: 1) and pushes the severity dot to the right — mirrors the
+  // bottom-row pattern used by the spacing visual.
+  const num = document.createElement('div')
+  num.className = 'finding-item__numerics'
+
+  const d = (f.details ?? {}) as { text?: string }
+  const note = document.createElement('span')
+  note.className = 'finding-item__numerics-text'
+  note.textContent = d.text ? `"${d.text}"` : 'vague phrase'
+  num.appendChild(note)
+
+  // 2.4.4 is workshop-flagged as warning-severity; use mild rather than the
+  // default severe so the dot reads as "should fix" not "must fix".
+  num.appendChild(buildSeverityDot('mild'))
+
+  wrap.appendChild(num)
   return wrap
 }
 
@@ -675,8 +730,9 @@ function passLabel(criterion: string): string {
     case '1.4.3': return 'Text contrast'
     case '1.4.11': return 'Element contrast'
     case '1.4.5': return 'Image of text'
-    case '1.4.12': return 'Text spacing'
+    case 'typography': return 'Typography'
     case '3.3.2': return 'Form label'
+    case '2.4.4': return 'Link purpose'
     case '1.4.1': return 'Use of color'
     case '2.4.7': return 'Focus visible'
     case '3.3.1': return 'Error identification'

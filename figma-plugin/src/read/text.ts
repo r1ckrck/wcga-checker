@@ -87,6 +87,13 @@ export async function buildTextElement(
   const background = await sampleBackground(node, { rootFallback })
   const bbox = toBBox(node.absoluteBoundingBox)
 
+  // Figma exposes paragraphSpacing on the TextNode (not on style segments).
+  // It's a plain number; `figma.mixed` happens only when the node is being
+  // edited mid-flush, which won't occur during an audit. Guard defensively.
+  const rawParagraphSpacing = (node as TextNode).paragraphSpacing
+  const paragraphSpacingPx =
+    typeof rawParagraphSpacing === 'number' ? rawParagraphSpacing : null
+
   return {
     kind: 'text',
     id: node.id,
@@ -94,6 +101,7 @@ export async function buildTextElement(
     characters: node.characters.slice(0, 60),
     isSingleLine: !node.characters.includes('\n'),
     isSingleVisualLine: detectSingleVisualLine(bbox.height, segments),
+    paragraphSpacingPx,
     segments,
     background,
     bbox,

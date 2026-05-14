@@ -1,0 +1,613 @@
+WEBVTT
+
+1
+00:00:04.080 --> 00:00:13.360
+So this is very interesting uh uh topic uh actually if you see if you go to any website there could be flashy items, flashy graphics.
+
+2
+00:00:13.359 --> 00:00:17.600
+Okay, for some people it might be interesting, but not for all.
+
+3
+00:00:17.600 --> 00:00:23.359
+Okay, there is a criteria which says risk associated with non-conformity with accessibility guidelines.
+
+4
+00:00:23.359 --> 00:00:25.679
+I want to read it out so it's very important.
+
+5
+00:00:25.679 --> 00:00:34.000
+It says that visually impaired people cannot access the content, so that is a very uh you know important criteria that you can be penalized.
+
+6
+00:00:34.000 --> 00:00:41.359
+And people with epidemic may get seizures if the website or app has content which blink very fast.
+
+7
+00:00:41.359 --> 00:00:41.920
+Okay?
+
+8
+00:00:41.920 --> 00:00:45.439
+Very you like these are the things which is commonly you use it.
+
+9
+00:00:45.439 --> 00:00:54.079
+And uh unfortunately when we go through Bajaj website ma'am's first uh input was that it was too flashy, too many things are flashing here and there.
+
+10
+00:00:54.079 --> 00:00:58.799
+So it was very difficult to look into the website for very long time, you know.
+
+11
+00:00:58.800 --> 00:01:01.280
+So it's very difficult.
+
+12
+00:01:01.280 --> 00:01:03.360
+You can also try it out.
+
+13
+00:01:03.359 --> 00:01:08.239
+Not as a person who works here, but as a outsider.
+
+14
+00:01:08.239 --> 00:01:14.560
+And then we have hearing or auditory in fact people cannot access the content again that is also going to be a difficult part.
+
+15
+00:01:14.560 --> 00:01:23.519
+So people with cognitive disability cannot access the time dependent function which even Abba Wam was also mentioning uh feeding the data in OTP.
+
+16
+00:01:23.519 --> 00:01:27.039
+Okay, the time duration is really relevant, important.
+
+17
+00:01:27.040 --> 00:01:32.000
+And then people with locomotive or physical disability cannot access the whole content present on the website.
+
+18
+00:01:32.079 --> 00:01:35.679
+So some shortcut keys are not working, okay, something like that.
+
+19
+00:01:35.680 --> 00:01:41.599
+And if the content is not robust enough to be interpreted reliably by a wide variety of user agents.
+
+20
+00:01:41.600 --> 00:01:44.239
+Now we came across so many assistive technologies.
+
+21
+00:01:44.240 --> 00:01:47.359
+So they might be using different devices, different tools.
+
+22
+00:01:47.359 --> 00:01:53.039
+So whether that website or app is compatibility with other assistive devices.
+
+23
+00:01:53.040 --> 00:01:57.439
+And if the content that is done, people who do not understand English language.
+
+24
+00:01:57.439 --> 00:02:05.679
+So if you see in government websites it's maldit that multi-language, like almost uh sixteen, twenty languages, uh you can you know switch your website.
+
+25
+00:02:05.680 --> 00:02:08.719
+But as of now for the testing we are testing only English.
+
+26
+00:02:08.719 --> 00:02:13.520
+Okay, we don't have automation tools to test other languages as of now.
+
+27
+00:02:13.520 --> 00:02:19.120
+Uh so people who do not understand English language cannot access web or app content and services.
+
+28
+00:02:19.120 --> 00:02:28.639
+And the government organization concern can face legal actions as well as per national and international laws if the content of the website app is not accessible.
+
+29
+00:02:28.640 --> 00:02:35.120
+Labels or instructions are not provided when content requires user input, like which Namrita was mentioning.
+
+30
+00:02:35.120 --> 00:02:40.319
+So she could guess that okay, there is a sign-in, you know, login page there.
+
+31
+00:02:40.319 --> 00:02:41.680
+So she landed over there.
+
+32
+00:02:41.680 --> 00:02:45.680
+But actually, your website should take a user to the right thing.
+
+33
+00:02:45.680 --> 00:02:58.639
+That you should say this is the feed information you know need to be provided by the user, some heading, so that you know that screen reader can land to that page and so that the data entry can be given easily.
+
+34
+00:02:58.640 --> 00:03:09.360
+So moving forward, uh this is already there, it's from that document which I just shared you, the link, uh gig manual 3.2, uh 3.0 is there, J GW manual 2.0 is there.
+
+35
+00:03:09.360 --> 00:03:16.479
+So basically what they're doing is they're adding uh before for intellectual disability, there was no criteria, so they've added few elements into it.
+
+36
+00:03:16.480 --> 00:03:18.479
+So the criteria keeps increasing.
+
+37
+00:03:18.480 --> 00:03:23.840
+So you have to make sure that the latest document whatever is there, you refer it and then you can include it in your
+
+38
+00:03:24.719 --> 00:03:28.000
+you know when you build any app or website.
+
+39
+00:03:29.680 --> 00:03:33.120
+So for WCG conformance level, what is required?
+
+40
+00:03:33.120 --> 00:03:36.960
+Okay, this already uh Guru explained you what is the success criteria.
+
+41
+00:03:36.960 --> 00:03:40.640
+So we have basically distinguished between level A and level A.
+
+42
+00:03:40.879 --> 00:03:49.439
+And as the GAGW, they made all the mandate that which is standard, that is our target, which is highlighted in orange color, if you see on the right side.
+
+43
+00:03:49.439 --> 00:03:56.800
+Whereas level A is the minimum requirements, which is must-have, but this is like standard, you cannot, it's non-negotiable, you cannot omit it.
+
+44
+00:03:56.800 --> 00:03:57.280
+Okay?
+
+45
+00:03:57.280 --> 00:04:06.240
+So in level 8 says all text on all images, keyboard navigation for all functions, no content flashing more than three times per second.
+
+46
+00:04:06.319 --> 00:04:08.720
+So this is your guidelines which you need to follow.
+
+47
+00:04:08.719 --> 00:04:13.759
+Page title on every page, then language of page identified in a code.
+
+48
+00:04:13.760 --> 00:04:34.160
+Okay, and for level A, if you see color counter statue, which we just explained, 4.15 is too for text and text resizable up to 200% without loss, consistent navigation across pages, clear error identification and suggestions, and focus visible for keyboard users.
+
+49
+00:04:34.160 --> 00:04:37.039
+So, likewise, this is as per the guidelines we have listed.
+
+50
+00:04:37.040 --> 00:04:39.360
+What is the important criteria you have to look into?
+
+51
+00:04:39.360 --> 00:04:42.240
+Same thing, which is like you know, we have already repeated.
+
+52
+00:04:42.240 --> 00:04:45.839
+What I have not explained till now is that forms with clear label.
+
+53
+00:04:45.840 --> 00:04:58.400
+So we insist that when we are validating the website also, we make sure that where the user basically land up, either they look into careers, they look into feedback form, okay, they'll look into home page.
+
+54
+00:04:58.400 --> 00:05:01.200
+Even homepage, if you see there are a lot of difficulties.
+
+55
+00:05:01.199 --> 00:05:09.440
+That's the front page of your website, and you have to make sure that at least the home page, not at least, at least homepage is the first thing which need to be accessible.
+
+56
+00:05:09.439 --> 00:05:19.120
+But there itself we find so much of violations, you know, almost 60-70 test cases we used to take it, and then we say violations are happening over there.
+
+57
+00:05:20.800 --> 00:05:27.199
+Uh so similar way for IS, so these are the things uh listed like what are the criteria under each and every guidelines.
+
+58
+00:05:27.199 --> 00:05:30.240
+Now you can understand the differentiation between each and every guidelines.
+
+59
+00:05:30.240 --> 00:05:45.920
+So in IS 167802 is India's national standard aligned with again it is WCHE 2.1 only, but specific specifically designed for government digital services in India and it covers web mobile apps, both Android and iOS, and digital documents.
+
+60
+00:05:45.920 --> 00:05:51.519
+It mandates testing with assistive technologies like NVDA, JAWS and Screen Magnetized.
+
+61
+00:05:51.519 --> 00:05:56.000
+And it requires both automated testing and manual testing with real users.
+
+62
+00:05:56.000 --> 00:06:01.120
+Organizations must document and report complaints regularly.
+
+63
+00:06:01.439 --> 00:06:05.520
+Okay, uh this I have explained you in the morning like what is the
+
+64
+00:06:06.400 --> 00:06:11.039
+yeah yeah testing, but A this is actually giving you the exact percentage.
+
+65
+00:06:11.040 --> 00:06:45.199
+Okay, for automatic testing if you see 30 to 40 percent of the issues can be alerted, and here it will be more focused on the uh code-based uh you know changes you can do with respect to all text, area attributes, and all those things, contrast failures, and whereas in manual testing the visual appearance, so as I told you the links button so that will actually come uh you know take takes care of 60 to 70 percent of the issues and whereas in user testing and that is mandatory without that you cannot actually complain uh any website 100%.
+
+66
+00:06:45.439 --> 00:06:55.280
+So when we come across, like you know, as ma'am said that you know we tested multiple websites, and these are the common issues which actually got highlighted.
+
+67
+00:06:55.280 --> 00:06:59.360
+The errors mostly we see it in most of the websites.
+
+68
+00:06:59.360 --> 00:07:03.040
+One is the low contest text, which is easily you can actually solve it.
+
+69
+00:07:03.040 --> 00:07:05.120
+Next is missing alt text or images.
+
+70
+00:07:05.120 --> 00:07:10.880
+Again, briefly, Guru explained to you what exactly the purpose of that image need to be explained, okay?
+
+71
+00:07:10.879 --> 00:07:14.800
+And rather than just telling that it is a logo or something like that.
+
+72
+00:07:14.800 --> 00:07:18.000
+And then empty or vagling text should not be there.
+
+73
+00:07:18.000 --> 00:07:20.320
+You cannot leave anything without tagging.
+
+74
+00:07:20.319 --> 00:07:24.560
+That is again, you know, it lands unnecessarily and it creates confusion.
+
+75
+00:07:24.560 --> 00:07:27.120
+Uh forms with no labels.
+
+76
+00:07:27.120 --> 00:07:45.360
+I told you wherever the user interface is there that has to be properly identified or uh you know informed and then missing page language, keyboard traps and models and menus, no visible focus indicator, videos with no captions, and PDF documents which is not tagged, error messages not descriptive.
+
+77
+00:07:45.360 --> 00:07:52.079
+So these are the things and uh even the uh WCG criteria I've explained uh what is uh you know need to be addressed.
+
+78
+00:07:53.280 --> 00:07:57.599
+Uh PDF documents not tagged, uh how would that how would you tag it?
+
+79
+00:07:57.600 --> 00:07:58.399
+How is it supposed to be?
+
+80
+00:07:58.319 --> 00:08:01.199
+So sir, what happens, you know, I have uh gone through one website.
+
+81
+00:08:01.199 --> 00:08:04.240
+It it only says PDF document one, PDF document two.
+
+82
+00:08:04.240 --> 00:08:05.040
+What does it mean?
+
+83
+00:08:05.040 --> 00:08:09.440
+Like as a user if I'm a visually employer, I need to know what exactly the document is.
+
+84
+00:08:09.439 --> 00:08:11.199
+See for example, brochure.
+
+85
+00:08:11.360 --> 00:08:15.920
+You know the document title need to be given so that I know okay I need to go through the brochure.
+
+86
+00:08:15.920 --> 00:08:17.519
+Or if it is a manual, yeah.
+
+87
+00:08:17.520 --> 00:08:19.600
+It's the PDF file name that you need
+
+88
+00:08:20.800 --> 00:08:22.399
+to or is it REAL level also?
+
+89
+00:08:22.720 --> 00:08:24.079
+Even both I mean
+
+90
+00:08:27.280 --> 00:08:35.600
+Usually what happens is when we are saving a documentary and converting any doc into a PDF, we just uh put our numbers.
+
+91
+00:08:35.600 --> 00:08:39.919
+Zero zero one sometimes a date, you know, PDF date, today's date.
+
+92
+00:08:39.919 --> 00:08:42.560
+But that's very confusing for the user.
+
+93
+00:08:42.560 --> 00:08:46.639
+So what you need to do is one that you tap it the way it is.
+
+94
+00:08:46.639 --> 00:08:49.360
+For example, I give you an example of history of
+
+95
+00:08:50.399 --> 00:08:59.440
+Justice, what we did was we got thousands of cases, and every case was 001223 11457.
+
+96
+00:08:59.440 --> 00:09:01.040
+What does that mean to a user?
+
+97
+00:09:01.039 --> 00:09:01.519
+Nothing.
+
+98
+00:09:01.519 --> 00:09:18.000
+So any user who was with disability going to that particular period they would want to know state government Ulisa versus this this this this is a case right so if you just tag it that way it makes sense two what we are talking about is also the alt text to it.
+
+99
+00:09:18.639 --> 00:09:19.600
+Yes, ma'am.
+
+100
+00:09:19.919 --> 00:09:20.800
+Sorry.
+
+101
+00:09:20.800 --> 00:09:28.480
+Uh the government of India uh guidelines you just wrote in the previous slides, the PDF file name was some number.
+
+102
+00:09:40.879 --> 00:09:42.000
+Yeah over the PDF.
+
+103
+00:09:42.159 --> 00:09:46.480
+PDF uh name is uh the year, month and date.pdf.
+
+104
+00:09:47.120 --> 00:09:49.200
+It doesn't make any sense, that's what we are seeing.
+
+105
+00:09:49.200 --> 00:09:57.280
+So uh visually actually the text is written geek w, but whereas in screen reader if you refer it is only the number, I cannot actually understand.
+
+106
+00:09:57.279 --> 00:09:58.240
+It's from the government.
+
+107
+00:09:58.240 --> 00:09:59.840
+I have not created the website.
+
+108
+00:09:59.840 --> 00:10:07.520
+Yeah, but we are also talking the government, you know, whenever you do a scanning, like there's a online page and you convert it into a PDF.
+
+109
+00:10:07.519 --> 00:10:12.799
+There are certain times what they do is there is a memo or there's a notification or there's an order.
+
+110
+00:10:12.800 --> 00:10:14.880
+They take a photograph and put it there.
+
+111
+00:10:14.879 --> 00:10:19.680
+So you have to put OCR so that the version is readable by the screen reader.
+
+112
+00:10:19.680 --> 00:10:25.120
+So just putting a photo, a JPEG image of a letter or a memo doesn't work.
+
+113
+00:10:25.120 --> 00:10:28.560
+So the accessibility formats tools are available.
+
+114
+00:10:28.560 --> 00:10:34.880
+The only thing is that mindset, the understanding, and the way to do is is what you have to do.
+
+115
+00:10:34.879 --> 00:10:41.120
+But I appreciate your question because you are relating with what I have said and then you look connecting with the presentation.
+
+116
+00:10:41.120 --> 00:10:43.360
+That's nice.
+
+117
+00:10:44.879 --> 00:10:46.800
+Okay, so only couple of slides.
+
+118
+00:10:46.800 --> 00:10:52.159
+This is going to be interesting, just an example you have to just you know listen or you know look into the examples.
+
+119
+00:10:52.159 --> 00:10:59.039
+Uh so here um this basically about the like how like I told you no, there are three phases.
+
+120
+00:10:59.039 --> 00:11:04.960
+One at the beginning, there's no afterthought better if you are going to start any website or application now.
+
+121
+00:11:04.960 --> 00:11:10.080
+Put your thought that accessibility is going to be your main criteria, okay, and the design base.
+
+122
+00:11:10.080 --> 00:11:11.600
+So create your scope, right?
+
+123
+00:11:11.840 --> 00:11:14.720
+He also was saying that you know whom he is going to address.
+
+124
+00:11:14.720 --> 00:11:19.680
+If it is a tier 2 and tier 3 cities, what about the people mindset and all those things?
+
+125
+00:11:19.680 --> 00:11:24.400
+But anyway, person with disabilities, they are living across the world and across India.
+
+126
+00:11:24.560 --> 00:11:29.520
+Okay, so you are going to address the vulnerable people.
+
+127
+00:11:29.519 --> 00:11:38.000
+So you have to define your scope and then know your users, third set acceptance criteria, which you already have, you have manual in your hand.
+
+128
+00:11:38.000 --> 00:11:41.600
+You have to just set which are the criteria which is the most to be addressed.
+
+129
+00:11:41.600 --> 00:11:45.120
+Some are mandatory, some are like maybe you can provide.
+
+130
+00:11:45.120 --> 00:11:49.280
+So it's an additional uh criteria which you can set.
+
+131
+00:11:49.279 --> 00:11:53.680
+Yeah, yeah, it's a tea break you want, you would like to take a break and then come back?
+
+132
+00:11:53.680 --> 00:11:54.640
+Yes everybody.
+
+133
+00:11:54.639 --> 00:11:55.840
+Yes, you want a break.
+
+134
+00:11:56.080 --> 00:12:00.240
+Okay, so we break for uh 20 minutes maximum.
+
+135
+00:12:00.240 --> 00:12:01.679
+Uh and you have to come back
+
+136
+00:12:02.639 --> 00:12:06.640
+at your own will, not at your own face.
+
+137
+00:12:06.879 --> 00:12:07.840
+Okay?
+
+138
+00:12:07.840 --> 00:12:08.480
+Alright.
+
+139
+00:12:08.639 --> 00:12:09.760
+Thanks.
+
+140
+00:12:55.759 --> 00:12:56.639
+And those
+
+141
+00:12:58.639 --> 00:13:00.400
+guys are open.
+
+142
+00:13:07.519 --> 00:13:09.040
+Why can't we
+
+143
+00:13:09.920 --> 00:13:12.400
+start the curvature from
+
+144
+00:13:13.680 --> 00:13:18.400
+plus y two, y plus two and
+
+145
+00:13:20.159 --> 00:13:21.360
+z Z2
+
+146
+00:13:22.240 --> 00:13:27.200
+and the curvature begins from there and then joins up with the rest of the housing body.
+
+147
+00:13:51.920 --> 00:13:55.600
+Alright now I want you to do a deep review of the full project folder, right?
+
+148
+00:13:55.680 --> 00:13:58.960
+I want you to go through every single file that we have created so
+
+149
+00:14:01.039 --> 00:14:03.360
+Understand everything, read through everything.
+
+150
+00:14:03.680 --> 00:14:10.480
+Uh make sure just uh go through every single line, understand everything you we have built together.
+
+151
+00:14:10.720 --> 00:14:21.440
+So far all the document the photo make sure that everything is built properly and it's gonna function perfectly right so just read through everything and just come back to me.
+
+152
+00:14:24.080 --> 00:14:31.040
+Please take as much time as you need, go through each file uh each file uh sequentially, systematically, programmatically.
+
+153
+00:14:31.200 --> 00:14:34.560
+Yeah, just to work with the key.

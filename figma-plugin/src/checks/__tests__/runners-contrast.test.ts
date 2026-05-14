@@ -46,6 +46,7 @@ const text = (over: Partial<TextElement> = {}): TextElement => ({
   characters: over.characters ?? 'Hello',
   isSingleLine: true,
   isSingleVisualLine: true,
+  paragraphSpacingPx: null,
   segments: over.segments ?? [segment()],
   background: over.background ?? solidBg('#FFFFFF', [255, 255, 255]),
   bbox: { x: 0, y: 0, width: 100, height: 20 },
@@ -71,6 +72,7 @@ const dto = (over: Partial<AuditDTO> = {}): AuditDTO => ({
   interactives: over.interactives ?? [],
   images: [],
   formInputs: [],
+  clickables: [],
   variants: null,
   warnings: [],
 })

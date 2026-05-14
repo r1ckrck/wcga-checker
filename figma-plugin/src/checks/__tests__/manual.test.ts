@@ -18,6 +18,7 @@ const emptyDTO = (over: Partial<AuditDTO> = {}): AuditDTO => ({
   interactives: [],
   images: [],
   formInputs: [],
+  clickables: [],
   variants: null,
   warnings: [],
   ...over,

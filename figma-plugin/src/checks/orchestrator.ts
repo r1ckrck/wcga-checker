@@ -11,6 +11,7 @@ import { aggregate, type Finding, type FindingsReport } from './findings.ts'
 import { runContrastCheck } from './runners/contrast.ts'
 import { runTypographyCheck } from './runners/typography.ts'
 import { runFormLabelCheck } from './runners/form-label.ts'
+import { runLinkPurposeCheck } from './runners/link-purpose.ts'
 import { runVariantCheck } from './runners/variant.ts'
 import { buildManualChecks } from './manual.ts'
 
@@ -20,13 +21,14 @@ import { buildManualChecks } from './manual.ts'
  * audit" action that calls {@link runVariantChecks}.
  */
 export async function runChecks(dto: AuditDTO): Promise<FindingsReport> {
-  const [contrast, typography, formLabel] = await Promise.all([
+  const [contrast, typography, formLabel, linkPurpose] = await Promise.all([
     Promise.resolve(runContrastCheck(dto)),
     Promise.resolve(runTypographyCheck(dto)),
     Promise.resolve(runFormLabelCheck(dto)),
+    Promise.resolve(runLinkPurposeCheck(dto)),
   ])
 
-  const all = [...contrast, ...typography, ...formLabel]
+  const all = [...contrast, ...typography, ...formLabel, ...linkPurpose]
   const buckets = aggregate(all)
 
   return {

@@ -83,6 +83,9 @@ export interface TextElement {
    * from bbox height vs effective line-height. Used for the line-height
    * auto-pass: a one-line block has no rendered line-height effect. */
   isSingleVisualLine: boolean
+  /** Figma's `paragraphSpacing` (px). Lives on the text node, not segments.
+   * `null` if unavailable (e.g. mixed-property edge case). */
+  paragraphSpacingPx: number | null
   segments: TextSegment[]
   background: BackgroundSample
   bbox: BBox
@@ -152,6 +155,37 @@ export interface FormInputElement {
   bbox: BBox
 }
 
+export type ClickableSignal = 'component-name' | 'variant-states' | 'designer-marked'
+
+/**
+ * A node classified as a clickable / tap target. Used by criteria that care
+ * about *user intent* to click — Link Purpose (2.4.4), Touch Target (2.5.8),
+ * etc. Distinct from `InteractiveElement` (which lives in src/read/interactive.ts
+ * and finds non-text contrast targets — vectors, shapes, icons — regardless
+ * of clickability).
+ *
+ * Identification is deliberately conservative: component-name regex match OR
+ * a variant set with interactive states (Hover / Focus / Pressed). Form inputs
+ * are excluded — they ride their own DTO path and aren't relevant to 2.4.4.
+ *
+ * Plain text content (all visible text descendants, normalized) is captured
+ * up-front so runners stay pure DTO consumers.
+ */
+export interface ClickableElement {
+  kind: 'clickable'
+  id: string
+  name: string
+  /** Name of the component-set or main component that fired the name signal, if any. */
+  componentName: string | null
+  /** All visible text descendants joined in document order, raw (untrimmed). */
+  textRaw: string
+  /** Same text after normalization (lowercase, trimmed, punctuation/arrows stripped). */
+  textNormalized: string
+  /** All signals that classified this node as clickable. */
+  signals: ClickableSignal[]
+  bbox: BBox
+}
+
 export interface VariantInfo {
   id: string
   name: string
@@ -193,6 +227,7 @@ export interface AuditDTO {
   interactives: InteractiveElement[]
   images: ImageElement[]
   formInputs: FormInputElement[]
+  clickables: ClickableElement[]
   variants: VariantData | null
   warnings: string[]
 }

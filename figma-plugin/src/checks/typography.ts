@@ -1,17 +1,27 @@
-// WCAG 1.4.12 text-spacing minimums.
-// Output uses % to speak Figma's language — designers set spacing in % in the
-// inspector, so the report stays consistent. The math under the hood still
-// works in px (input from the read pipeline) but every emitted value is
-// expressed as a percentage of the font size.
+// Typography readability checks. These are NOT WCAG 1.4.12 — that SC is a
+// user-override resilience test (does the design survive a forced 1.5× line
+// spacing?), not a designer-shipped minimum. The values here are general
+// readability floors that the workshop's audit feedback surfaced.
+//
+// Thresholds:
+//   line-height       ≥ 75%  of font size
+//   letter-spacing    ≥ -6%  of font size   (negative tracking allowed up to -6%)
+//   paragraph-spacing ≥ 70%  of effective line-height (not font size)
+//
+// Word-spacing is intentionally absent — Figma doesn't expose a UI for it,
+// so we can't measure or fix it at design stage.
+//
+// SC 1.4.12 itself will be picked up later by the container-resilience runner
+// (overflow risk when the user forces 1.5× line-height etc.) — see PLAN.md.
 
 export interface SpacingInput {
   fontSize: number
-  /** px value resolved from PERCENT/PIXELS by the read pipeline; null = unable to determine; undefined = AUTO (skip the check) */
+  /** px value resolved from PERCENT/PIXELS by the read pipeline; null = unable to determine; undefined = AUTO (skip line-height) */
   lineHeight?: number | null
-  /** px value resolved from PERCENT/PIXELS; null = unable to determine */
+  /** px value resolved from PERCENT/PIXELS; null = unable to determine; can be negative */
   letterSpacing?: number | null
+  /** px paragraph spacing from TextNode; null = unable to determine */
   paragraphSpacing?: number | null
-  wordSpacing?: number | null
   singleLine?: boolean
 }
 
@@ -19,52 +29,43 @@ export type SpacingProperty =
   | 'line-height'
   | 'letter-spacing'
   | 'paragraph-spacing'
-  | 'word-spacing'
 
 export interface SpacingResult {
   property: SpacingProperty
-  /** Human-readable actual value, e.g. "157%" or "0% (default)" or "not set" */
+  /** Human-readable actual value, e.g. "85%" or "-6%" or "not set" */
   actual: string
-  /** Human-readable required threshold, e.g. "≥150%" */
+  /** Human-readable required threshold, e.g. "≥75%" or "≥-6%" */
   required: string
-  /** Numeric values for downstream consumers — percent values, never px */
+  /** Numeric values for downstream consumers — percent values */
   actualPercent: number | null
   requiredPercent: number
   pass: boolean | null
 }
 
+type Baseline = 'font-size' | 'line-height'
+
 interface RuleSpec {
   property: SpacingProperty
-  /** Required minimum as a percentage of font size */
   thresholdPercent: number
-  /**
-   * Bug 3: a value of 0 in this property is the Figma default ("no override
-   * applied"). For letter-spacing and word-spacing this means the font's
-   * natural tracking is in effect — WCAG 1.4.12 is satisfied because the user
-   * can still override to the threshold without breaking the layout. Line-
-   * height of literal 0 is degenerate and stays a real fail.
-   */
-  zeroIsDefault: boolean
+  baseline: Baseline
 }
 
 const RULES: Record<SpacingProperty, RuleSpec> = {
-  'line-height':       { property: 'line-height',       thresholdPercent: 150, zeroIsDefault: false },
-  'letter-spacing':    { property: 'letter-spacing',    thresholdPercent: 12,  zeroIsDefault: true },
-  'paragraph-spacing': { property: 'paragraph-spacing', thresholdPercent: 200, zeroIsDefault: false },
-  'word-spacing':      { property: 'word-spacing',      thresholdPercent: 16,  zeroIsDefault: true },
+  'line-height':       { property: 'line-height',       thresholdPercent: 75,  baseline: 'font-size' },
+  'letter-spacing':    { property: 'letter-spacing',    thresholdPercent: -6,  baseline: 'font-size' },
+  'paragraph-spacing': { property: 'paragraph-spacing', thresholdPercent: 70,  baseline: 'line-height' },
 }
 
 /** Round a percent to a clean integer when possible, else 1 decimal. */
 function fmtPercent(percent: number): string {
   if (!Number.isFinite(percent)) return String(percent)
-  // Round to 1 decimal then drop the .0 for whole numbers.
   const rounded = Math.round(percent * 10) / 10
   return Number.isInteger(rounded) ? `${rounded}%` : `${rounded.toFixed(1)}%`
 }
 
 function evaluate(
   rule: RuleSpec,
-  fontSize: number,
+  baselinePx: number,
   valuePx: number | null | undefined
 ): SpacingResult {
   const requiredStr = `≥${rule.thresholdPercent}%`
@@ -80,20 +81,7 @@ function evaluate(
     }
   }
 
-  const percent = fontSize > 0 ? (valuePx / fontSize) * 100 : 0
-
-  // Bug 3 — Figma default of 0% means "use font's natural tracking", which
-  // WCAG 1.4.12 considers fine (user can still override).
-  if (rule.zeroIsDefault && valuePx === 0) {
-    return {
-      property: rule.property,
-      actual: '0% (default)',
-      required: requiredStr,
-      actualPercent: 0,
-      requiredPercent: rule.thresholdPercent,
-      pass: true,
-    }
-  }
+  const percent = baselinePx > 0 ? (valuePx / baselinePx) * 100 : 0
 
   return {
     property: rule.property,
@@ -105,16 +93,26 @@ function evaluate(
   }
 }
 
-/** Run WCAG 1.4.12 spacing checks. Returns one entry per applicable property. */
+/**
+ * Effective line-height for paragraph-spacing math. When the designer set an
+ * explicit value we use that; when AUTO / unset we approximate at 1.2× font
+ * size — Figma's intrinsic auto value sits in the 1.1×–1.3× range for most
+ * fonts. Slight inaccuracy is acceptable for a heuristic readability check.
+ */
+function effectiveLineHeight(input: SpacingInput): number {
+  if (input.lineHeight && input.lineHeight > 0) return input.lineHeight
+  return input.fontSize * 1.2
+}
+
+/** Run readability checks. Returns one entry per applicable property. */
 export function checkSpacing(input: SpacingInput): SpacingResult[] {
   const results: SpacingResult[] = []
   results.push(evaluate(RULES['line-height'], input.fontSize, input.lineHeight))
   results.push(evaluate(RULES['letter-spacing'], input.fontSize, input.letterSpacing))
   if (!input.singleLine) {
-    results.push(evaluate(RULES['paragraph-spacing'], input.fontSize, input.paragraphSpacing))
-  }
-  if (input.wordSpacing !== null && input.wordSpacing !== undefined) {
-    results.push(evaluate(RULES['word-spacing'], input.fontSize, input.wordSpacing))
+    results.push(
+      evaluate(RULES['paragraph-spacing'], effectiveLineHeight(input), input.paragraphSpacing)
+    )
   }
   return results
 }

@@ -2,55 +2,152 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { checkSpacing } from '../typography.ts'
 
-test('all set, all passing — fs=14 lh=22 ls=2 ps=30', () => {
-  const r = checkSpacing({
-    fontSize: 14,
-    lineHeight: 22,
-    letterSpacing: 2,
-    paragraphSpacing: 30,
-  })
-  assert.equal(r.length, 3)
-  // line-height: 22/14 ≈ 157.1%
-  assert.equal(r[0].property, 'line-height')
-  assert.equal(r[0].actual, '157.1%')
-  assert.equal(r[0].required, '≥150%')
-  assert.equal(r[0].pass, true)
-  // letter-spacing: 2/14 ≈ 14.3%
-  assert.equal(r[1].property, 'letter-spacing')
-  assert.equal(r[1].actual, '14.3%')
-  assert.equal(r[1].required, '≥12%')
-  assert.equal(r[1].pass, true)
-  // paragraph-spacing: 30/14 ≈ 214.3%
-  assert.equal(r[2].property, 'paragraph-spacing')
-  assert.equal(r[2].actual, '214.3%')
-  assert.equal(r[2].required, '≥200%')
-  assert.equal(r[2].pass, true)
+// ── Line-height (≥75% of font size) ─────────────────────────────────
+
+test('line-height 100% passes (above 75% floor)', () => {
+  const r = checkSpacing({ fontSize: 16, lineHeight: 16 })
+  const lh = r.find(x => x.property === 'line-height')
+  assert.equal(lh?.actual, '100%')
+  assert.equal(lh?.required, '≥75%')
+  assert.equal(lh?.pass, true)
 })
 
-test('all set, all failing — fs=16 lh=18 ls=0 (default → pass) ps=0', () => {
+test('exact 75% line-height passes — boundary', () => {
+  const r = checkSpacing({ fontSize: 100, lineHeight: 75 })
+  const lh = r.find(x => x.property === 'line-height')
+  assert.equal(lh?.actual, '75%')
+  assert.equal(lh?.pass, true)
+})
+
+test('74% line-height fails — just under the floor', () => {
+  const r = checkSpacing({ fontSize: 100, lineHeight: 74 })
+  const lh = r.find(x => x.property === 'line-height')
+  assert.equal(lh?.actual, '74%')
+  assert.equal(lh?.pass, false)
+})
+
+test('line-height undefined (AUTO) → "not set" / pass=null', () => {
+  const r = checkSpacing({ fontSize: 14 })
+  const lh = r.find(x => x.property === 'line-height')
+  assert.equal(lh?.actual, 'not set')
+  assert.equal(lh?.pass, null)
+})
+
+// ── Letter-spacing (≥ -6% of font size) ─────────────────────────────
+
+test('letter-spacing 0 passes (above -6% floor)', () => {
+  const r = checkSpacing({ fontSize: 16, letterSpacing: 0 })
+  const ls = r.find(x => x.property === 'letter-spacing')
+  assert.equal(ls?.actual, '0%')
+  assert.equal(ls?.required, '≥-6%')
+  assert.equal(ls?.pass, true)
+})
+
+test('letter-spacing -6% passes — boundary', () => {
+  // -6% of 16 = -0.96
+  const r = checkSpacing({ fontSize: 16, letterSpacing: -0.96 })
+  const ls = r.find(x => x.property === 'letter-spacing')
+  assert.equal(ls?.actual, '-6%')
+  assert.equal(ls?.pass, true)
+})
+
+test('letter-spacing tighter than -6% fails', () => {
+  // -10% of 16 = -1.6
+  const r = checkSpacing({ fontSize: 16, letterSpacing: -1.6 })
+  const ls = r.find(x => x.property === 'letter-spacing')
+  assert.equal(ls?.actual, '-10%')
+  assert.equal(ls?.pass, false)
+})
+
+test('letter-spacing positive value passes', () => {
+  // 12% of 14 ≈ 1.68
+  const r = checkSpacing({ fontSize: 14, letterSpacing: 1.68 })
+  const ls = r.find(x => x.property === 'letter-spacing')
+  assert.equal(ls?.pass, true)
+})
+
+// ── Paragraph-spacing (≥70% of line-height) ─────────────────────────
+
+test('paragraph-spacing 70% of line-height passes — boundary', () => {
+  // line-height 20, paragraph spacing 14 → 70%
   const r = checkSpacing({
     fontSize: 16,
-    lineHeight: 18,
-    letterSpacing: 0,
-    paragraphSpacing: 0,
+    lineHeight: 20,
+    paragraphSpacing: 14,
+    singleLine: false,
   })
-  assert.equal(r.length, 3)
-  // line-height fails — 18/16 = 112.5%
-  assert.equal(r[0].property, 'line-height')
-  assert.equal(r[0].pass, false)
-  assert.equal(r[0].actual, '112.5%')
-  // Bug 3 — letter-spacing 0 = default tracking → pass
-  assert.equal(r[1].property, 'letter-spacing')
-  assert.equal(r[1].pass, true)
-  assert.equal(r[1].actual, '0% (default)')
-  // paragraph-spacing 0 still fails (it's not a "default" property in the
-  // same way — 0 paragraph spacing means paragraphs are touching)
-  assert.equal(r[2].property, 'paragraph-spacing')
-  assert.equal(r[2].pass, false)
-  assert.equal(r[2].actual, '0%')
+  const ps = r.find(x => x.property === 'paragraph-spacing')
+  assert.equal(ps?.actual, '70%')
+  assert.equal(ps?.required, '≥70%')
+  assert.equal(ps?.pass, true)
 })
 
-test('single-line skips paragraph — fs=14 lh=21 ls=2 singleLine=true', () => {
+test('paragraph-spacing 60% of line-height fails', () => {
+  const r = checkSpacing({
+    fontSize: 16,
+    lineHeight: 20,
+    paragraphSpacing: 12,
+    singleLine: false,
+  })
+  const ps = r.find(x => x.property === 'paragraph-spacing')
+  assert.equal(ps?.actual, '60%')
+  assert.equal(ps?.pass, false)
+})
+
+test('paragraph-spacing falls back to 1.2× fontSize when line-height is AUTO/null', () => {
+  // No explicit lineHeight → falls back to 1.2 * 16 = 19.2 baseline.
+  // Need spacing = 0.7 * 19.2 = 13.44 to pass.
+  const passing = checkSpacing({
+    fontSize: 16,
+    paragraphSpacing: 14,
+    singleLine: false,
+  })
+  const psPass = passing.find(x => x.property === 'paragraph-spacing')
+  assert.equal(psPass?.pass, true)
+
+  const failing = checkSpacing({
+    fontSize: 16,
+    paragraphSpacing: 10,
+    singleLine: false,
+  })
+  const psFail = failing.find(x => x.property === 'paragraph-spacing')
+  assert.equal(psFail?.pass, false)
+})
+
+test('paragraph-spacing null → unable to determine', () => {
+  const r = checkSpacing({
+    fontSize: 16,
+    lineHeight: 20,
+    paragraphSpacing: null,
+    singleLine: false,
+  })
+  const ps = r.find(x => x.property === 'paragraph-spacing')
+  assert.equal(ps?.actual, 'not set')
+  assert.equal(ps?.pass, null)
+})
+
+test('single-line skips paragraph-spacing entirely', () => {
+  const r = checkSpacing({
+    fontSize: 14,
+    lineHeight: 21,
+    paragraphSpacing: 0,
+    singleLine: true,
+  })
+  assert.equal(r.find(x => x.property === 'paragraph-spacing'), undefined)
+})
+
+// ── Word-spacing removed ────────────────────────────────────────────
+
+test('word-spacing is no longer in the result set', () => {
+  const r = checkSpacing({ fontSize: 14, lineHeight: 21 })
+  // SpacingProperty no longer includes word-spacing — runtime check still
+  // useful to catch a regression where the rule sneaks back in.
+  assert.equal(r.find(x => (x.property as string) === 'word-spacing'), undefined)
+})
+
+// ── Result shape ────────────────────────────────────────────────────
+
+test('returns line-height + letter-spacing when single-line=true (paragraph-spacing skipped)', () => {
   const r = checkSpacing({
     fontSize: 14,
     lineHeight: 21,
@@ -59,41 +156,25 @@ test('single-line skips paragraph — fs=14 lh=21 ls=2 singleLine=true', () => {
   })
   assert.equal(r.length, 2)
   assert.equal(r[0].property, 'line-height')
-  assert.equal(r[0].actual, '150%')
-  assert.equal(r[0].pass, true)
   assert.equal(r[1].property, 'letter-spacing')
-  assert.equal(r.find(x => x.property === 'paragraph-spacing'), undefined)
 })
 
-test('missing values → pass=null with "not set" actual', () => {
-  const r = checkSpacing({ fontSize: 14 })
+test('returns three entries when multi-line', () => {
+  const r = checkSpacing({
+    fontSize: 14,
+    lineHeight: 21,
+    letterSpacing: 2,
+    paragraphSpacing: 20,
+    singleLine: false,
+  })
   assert.equal(r.length, 3)
-  for (const entry of r) {
-    assert.equal(entry.actual, 'not set')
-    assert.equal(entry.pass, null)
-  }
-  assert.equal(r[0].required, '≥150%')
-  assert.equal(r[1].required, '≥12%')
-  assert.equal(r[2].required, '≥200%')
 })
 
-test('word-spacing only emitted when provided; word-spacing 0 → default pass (Bug 3)', () => {
-  const without = checkSpacing({ fontSize: 14 })
-  assert.equal(without.find(x => x.property === 'word-spacing'), undefined)
-
-  const withWord = checkSpacing({ fontSize: 14, wordSpacing: 3 })
-  const ws = withWord.find(x => x.property === 'word-spacing')
-  assert.ok(ws)
-  assert.equal(ws!.property, 'word-spacing')
-  // 3/14 ≈ 21.4%
-  assert.equal(ws!.actual, '21.4%')
-  assert.equal(ws!.required, '≥16%')
-  assert.equal(ws!.pass, true)
-
-  const withZero = checkSpacing({ fontSize: 14, wordSpacing: 0 })
-  const ws0 = withZero.find(x => x.property === 'word-spacing')
-  assert.equal(ws0!.actual, '0% (default)')
-  assert.equal(ws0!.pass, true)
+test('zero fontSize edge case — no throw, ratio defaults to 0', () => {
+  const r = checkSpacing({ fontSize: 0, lineHeight: 10 })
+  const lh = r.find(x => x.property === 'line-height')
+  assert.equal(lh?.actual, '0%')
+  assert.equal(lh?.pass, false)
 })
 
 test('null values treated as not set', () => {
@@ -102,39 +183,9 @@ test('null values treated as not set', () => {
   assert.equal(r[1].pass, null)
 })
 
-test('exact 150% line-height passes — boundary', () => {
-  const r = checkSpacing({ fontSize: 14, lineHeight: 21 })
-  assert.equal(r[0].pass, true)
-  assert.equal(r[0].actual, '150%')
-})
-
-test('zero fontSize edge case — no throw, ratio defaults to 0', () => {
-  const r = checkSpacing({ fontSize: 0, lineHeight: 10 })
-  // Division by zero guarded → percent = 0
-  assert.equal(r[0].actual, '0%')
-  assert.equal(r[0].required, '≥150%')
-  assert.equal(r[0].pass, false)
-})
-
-test('Bug 3 — letter-spacing 0 always passes (default tracking)', () => {
-  const r = checkSpacing({ fontSize: 14, lineHeight: 22, letterSpacing: 0 })
-  const ls = r.find(x => x.property === 'letter-spacing')
-  assert.ok(ls)
-  assert.equal(ls!.pass, true)
-  assert.equal(ls!.actual, '0% (default)')
-})
-
-test('letter-spacing below threshold (non-zero) still fails', () => {
-  // letter-spacing of 1px on 14px font = 7.1%, below 12% threshold
-  const r = checkSpacing({ fontSize: 14, lineHeight: 22, letterSpacing: 1 })
-  const ls = r.find(x => x.property === 'letter-spacing')
-  assert.ok(ls)
-  assert.equal(ls!.pass, false)
-  assert.equal(ls!.actual, '7.1%')
-})
-
-test('actualPercent is exposed numerically', () => {
+test('actualPercent + requiredPercent are exposed numerically', () => {
   const r = checkSpacing({ fontSize: 14, lineHeight: 22 })
-  assert.equal(r[0].actualPercent, (22 / 14) * 100)
-  assert.equal(r[0].requiredPercent, 150)
+  const lh = r.find(x => x.property === 'line-height')
+  assert.equal(lh?.actualPercent, (22 / 14) * 100)
+  assert.equal(lh?.requiredPercent, 75)
 })

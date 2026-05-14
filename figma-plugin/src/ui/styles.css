@@ -284,6 +284,435 @@ p {
   outline-offset: 2px;
 }
 
+/* ── Mark button (between AI indicator and settings cog) ─────────── */
+
+.header__mark {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 18px;
+  padding: 0 var(--space-2);
+  background: transparent;
+  border: 0;
+  color: var(--mute);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+.header__mark .icon {
+  width: 12px;
+  height: 12px;
+}
+
+.header__mark:hover,
+.header__mark:focus-visible {
+  color: var(--fg);
+  outline: none;
+}
+
+.header__mark:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Collapse to icon-only on narrow plugin widths so the header doesn't crowd. */
+@media (max-width: 320px) {
+  .header__mark-label {
+    display: none;
+  }
+  .header__mark {
+    padding: 0;
+    width: 18px;
+    justify-content: center;
+  }
+}
+
+/* ── Marking page (full-panel takeover, sibling of #main + settings) ── */
+
+.marking-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.marking-page[hidden] {
+  display: none;
+}
+
+.marking-page__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.marking-page__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--mute);
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+.marking-page__close .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.marking-page__close:hover,
+.marking-page__close:focus-visible {
+  color: var(--fg);
+  outline: none;
+}
+
+.marking-page__close:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.marking-page__title {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg);
+  font-weight: 500;
+}
+
+.marking-page__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1 1 auto;
+  min-height: 0;
+  color: var(--fg);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.marking-empty {
+  margin: 0;
+  color: var(--mute);
+  font-size: 12px;
+}
+
+/* ── Selection card ───────────────────────────────────────────────── */
+
+.marking-selection-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--hairline);
+  background: transparent;
+}
+
+.marking-selection-card__name {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg);
+  word-break: break-all;
+}
+
+.marking-selection-card__meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--mute);
+}
+
+/* ── State pill (Include / Exclude) ───────────────────────────────── */
+
+.marking-pill {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+  padding: 2px var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.marking-pill__dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.marking-pill--include {
+  color: var(--accent);
+}
+.marking-pill--include .marking-pill__dot {
+  background: var(--accent);
+}
+
+.marking-pill--exclude {
+  color: var(--status-exclude);
+}
+.marking-pill--exclude .marking-pill__dot {
+  background: var(--status-exclude);
+}
+
+/* ── Primary CTAs (Include / Exclude) ─────────────────────────────── */
+
+.marking-ctas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.marking-ctas__btn {
+  height: 36px;
+  padding: 0 var(--space-3);
+  background: transparent;
+  border: 1px solid;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.marking-ctas__btn--include {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.marking-ctas__btn--include:hover:not(:disabled):not(.marking-ctas__btn--active),
+.marking-ctas__btn--include:focus-visible:not(.marking-ctas__btn--active) {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  outline: none;
+}
+
+.marking-ctas__btn--include.marking-ctas__btn--active {
+  background: var(--accent);
+  color: var(--bg);
+  cursor: default;
+}
+
+.marking-ctas__btn--exclude {
+  border-color: var(--status-exclude);
+  color: var(--status-exclude);
+}
+
+.marking-ctas__btn--exclude:hover:not(:disabled):not(.marking-ctas__btn--active),
+.marking-ctas__btn--exclude:focus-visible:not(.marking-ctas__btn--active) {
+  background: color-mix(in srgb, var(--status-exclude) 12%, transparent);
+  outline: none;
+}
+
+.marking-ctas__btn--exclude.marking-ctas__btn--active {
+  background: var(--status-exclude);
+  color: var(--bg);
+  cursor: default;
+}
+
+.marking-ctas__btn:disabled {
+  border-color: var(--hairline);
+  color: var(--mute);
+  cursor: not-allowed;
+}
+
+.marking-ctas__btn:focus-visible {
+  outline: 1px solid var(--focus-ring, var(--accent));
+  outline-offset: 2px;
+}
+
+.marking-ctas__reset {
+  align-self: center;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--mute);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+.marking-ctas__reset:hover,
+.marking-ctas__reset:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+.marking-ctas__reset:focus-visible {
+  outline: 1px solid var(--focus-ring, var(--accent));
+  outline-offset: 2px;
+}
+
+/* ── Descendant list (rows for interactives in the selection subtree) ─ */
+
+.marking-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--hairline);
+}
+
+.marking-list__heading {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mute);
+  margin-bottom: var(--space-2);
+}
+
+.marking-list__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid transparent;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.marking-list__row:hover {
+  border-color: var(--hairline);
+}
+
+.marking-list__row--exclude .marking-list__name {
+  text-decoration: line-through;
+  color: var(--mute);
+}
+
+.marking-list__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--hairline);
+}
+
+.marking-list__dot--include {
+  background: var(--accent);
+}
+
+.marking-list__dot--exclude {
+  background: var(--status-exclude);
+}
+
+.marking-list__name {
+  display: inline-block;
+  text-align: left;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.marking-list__name:hover,
+.marking-list__name:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+.marking-list__name:focus-visible {
+  outline: 1px solid var(--focus-ring, var(--accent));
+  outline-offset: 2px;
+}
+
+.marking-list__auto {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px dashed var(--hairline);
+  border-radius: 2px;
+  color: var(--mute);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.marking-list__spacer {
+  width: 0;
+}
+
+.marking-list__controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.marking-list__icon-btn {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1;
+  color: var(--mute);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.marking-list__icon-btn:hover:not(:disabled):not(.marking-list__icon-btn--active) {
+  color: var(--fg);
+  border-color: var(--mute);
+}
+
+.marking-list__icon-btn:focus-visible {
+  outline: 1px solid var(--focus-ring, var(--accent));
+  outline-offset: 1px;
+}
+
+.marking-list__icon-btn--include.marking-list__icon-btn--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  cursor: default;
+}
+
+.marking-list__icon-btn--exclude.marking-list__icon-btn--active {
+  background: var(--status-exclude);
+  border-color: var(--status-exclude);
+  color: var(--bg);
+  cursor: default;
+}
+
+.marking-list__icon-btn:disabled {
+  color: var(--hairline);
+  cursor: not-allowed;
+}
+
+.marking-list__overflow {
+  margin: var(--space-2) 0 0 0;
+  color: var(--mute);
+  font-size: 11px;
+  font-style: italic;
+}
+
 /* ── Main column ────────────────────────────────────────────────── */
 
 .main {

@@ -67,7 +67,7 @@ function identityKey(f: Finding): string | null {
       if (actual == null || required == null) return null
       return `${f.criterion}|${actual}|${required}`
     }
-    case '1.4.12': {
+    case 'typography': {
       const property = typeof d.property === 'string' ? d.property : null
       const actual = typeof d.actual === 'string' ? d.actual : numStr(d.actual)
       const required = typeof d.required === 'string' ? d.required : numStr(d.required)

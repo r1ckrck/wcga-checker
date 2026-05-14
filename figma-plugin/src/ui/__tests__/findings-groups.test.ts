@@ -16,8 +16,8 @@ const ALL_EMITTED_CRITERIA = [
   '1.4.3',
   '1.4.5',
   '1.4.11',
-  '1.4.12',
   '2.2.2',
+  '2.4.4',
   '2.4.7',
   '2.5.1',
   '3.3.1',
@@ -80,9 +80,9 @@ test('unknown criterion falls back to other', () => {
   assert.equal(g, 'other')
 })
 
-test('GROUP_ORDER includes all 5 group ids exactly once', () => {
-  assert.equal(GROUP_ORDER.length, 5)
-  assert.equal(new Set(GROUP_ORDER).size, 5)
+test('GROUP_ORDER includes all 6 group ids exactly once', () => {
+  assert.equal(GROUP_ORDER.length, 6)
+  assert.equal(new Set(GROUP_ORDER).size, 6)
   for (const id of GROUP_ORDER) {
     assert.ok(GROUP_TITLES[id], `${id} missing title`)
   }
@@ -136,8 +136,8 @@ test('buildGroupViews returns groups in fixed order, omits empty', () => {
 
 test('buildGroupViews bins findings into pass/flag/toVerify correctly', () => {
   const report = emptyReport({
-    passes: [finding('1.4.12', 'pass', 'P1')],
-    flags: [finding('1.4.12', 'flag', 'F1')],
+    passes: [finding('typography', 'pass', 'P1')],
+    flags: [finding('typography', 'flag', 'F1')],
     unableToTest: [finding('1.4.5', 'unable-to-test', 'U1')],
     manual: [manual('1.3.3')],
   })
@@ -185,7 +185,7 @@ test('unknown criterion routes to other group view', () => {
 
 test('total counts match the input report (no duplication, no loss)', () => {
   const report = emptyReport({
-    passes: [finding('1.4.3'), finding('1.4.12'), finding('3.3.2')],
+    passes: [finding('1.4.3'), finding('typography'), finding('3.3.2')],
     flags: [finding('1.4.11', 'flag'), finding('2.4.7', 'flag')],
     unableToTest: [finding('1.4.5', 'unable-to-test')],
     manual: [manual('1.3.3'), manual('2.2.2'), manual('2.5.1', false)],

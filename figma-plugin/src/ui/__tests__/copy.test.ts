@@ -23,7 +23,7 @@ test('plainEnglishReason — unknown reason passes through', () => {
 test('typographyTitleFor — known properties', () => {
   assert.equal(typographyTitleFor('line-height'), 'Tight line height')
   assert.equal(typographyTitleFor('letter-spacing'), 'Tight letter spacing')
-  assert.equal(typographyTitleFor('paragraph-spacing'), 'No paragraph spacing')
+  assert.equal(typographyTitleFor('paragraph-spacing'), 'Tight paragraph spacing')
   assert.equal(typographyTitleFor('word-spacing'), 'No word spacing')
 })
 
@@ -40,6 +40,14 @@ test('parsePercent — extracts integer percent', () => {
 
 test('parsePercent — extracts decimal percent', () => {
   assert.equal(parsePercent('12.5%'), 12.5)
+})
+
+test('parsePercent — extracts negative percent', () => {
+  assert.equal(parsePercent('-12%'), -12)
+  assert.equal(parsePercent('-6.5%'), -6.5)
+  // Threshold strings prefix the value with ≥; the leading minus must still
+  // be captured.
+  assert.equal(parsePercent('≥-6%'), -6)
 })
 
 test('parsePercent — null on no percent', () => {

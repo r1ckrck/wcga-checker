@@ -25,12 +25,14 @@ export function headlineFor(finding: Finding): string {
       return 'Low element contrast'
     case '1.4.5':
       return 'Possible image of text'
-    case '1.4.12':
+    case 'typography':
       return typeof d.property === 'string'
         ? typographyTitleFor(d.property)
         : 'Tight text spacing'
     case '3.3.2':
       return formLabelHeadline(finding.message)
+    case '2.4.4':
+      return 'Vague link text'
     case '1.4.1':
       return useOfColorHeadline(d, finding.message)
     case '2.4.7':

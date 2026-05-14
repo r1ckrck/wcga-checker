@@ -59,7 +59,7 @@ const FONT_FACES = [
 // Phosphor Duotone is the locked icon system for the plugin (see CLAUDE.md →
 // Iconography). To add a new icon: drop the SVG into assets/icons/phosphor/
 // and append the name here.
-const PHOSPHOR_ICON_NAMES = ['check', 'warning', 'prohibit', 'cog']
+const PHOSPHOR_ICON_NAMES = ['check', 'warning', 'prohibit', 'cog', 'cursor-click', 'arrow-left']
 
 const MAIN_OUT = path.join(DIST, 'main.js')
 const UI_OUT = path.join(DIST, 'ui.html')
